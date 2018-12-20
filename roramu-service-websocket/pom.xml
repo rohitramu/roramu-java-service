@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>roramu.service</groupId>
+        <artifactId>roramu-service</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>roramu.service.websocket</groupId>
+    <artifactId>roramu-service-websocket</artifactId>
+
+    <dependencies>
+        <!-- roramu.util -->
+        <dependency>
+            <groupId>roramu.util.json</groupId>
+            <artifactId>roramu-util-json</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.string</groupId>
+            <artifactId>roramu-util-string</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.async</groupId>
+            <artifactId>roramu-util-async</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.exception</groupId>
+            <artifactId>roramu-util-exception</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- roramu.service.status -->
+        <dependency>
+            <groupId>roramu.service.status</groupId>
+            <artifactId>roramu-service-status</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- JavaX -->
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+    </dependencies>
+</project>
