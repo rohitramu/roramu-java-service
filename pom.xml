@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <groupId>roramu.service</groupId>
-    <artifactId>roramu-service</artifactId>
-    <version>${buildVersion}</version>
+    <artifactId>all</artifactId>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,14 +10,44 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <buildVersion>1.0</buildVersion>
-
-        <roramu.util.version>[1.0,999.0)</roramu.util.version>
+        <roramu.util.version>[0.0,999.0)</roramu.util.version>
     </properties>
 
     <modules>
-        <module>roramu-service-status</module>
-        <module>roramu-service-websocket</module>
-        <module>roramu-service-websocket-jetty</module>
+        <module>status</module>
+        <module>websocket</module>
+        <module>websocket-jetty</module>
     </modules>
+
+    <dependencies>
+        <!-- JUnit -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- JUnit 5 requires Surefire version 2.22.1 or higher -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

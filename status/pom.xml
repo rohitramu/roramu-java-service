@@ -4,24 +4,22 @@
 
     <parent>
         <groupId>roramu.service</groupId>
-        <artifactId>roramu-service</artifactId>
-        <version>[0.0,999.0)</version>
+        <artifactId>all</artifactId>
+        <version>1.0</version>
     </parent>
 
-    <groupId>roramu.service.status</groupId>
-    <artifactId>roramu-service-status</artifactId>
-    <version>${buildVersion}</version>
+    <artifactId>status</artifactId>
 
     <dependencies>
         <!-- roramu.util -->
         <dependency>
-            <groupId>roramu.util.net</groupId>
-            <artifactId>roramu-util-net</artifactId>
+            <groupId>roramu.util</groupId>
+            <artifactId>net</artifactId>
             <version>${roramu.util.version}</version>
         </dependency>
         <dependency>
-            <groupId>roramu.util.time</groupId>
-            <artifactId>roramu-util-time</artifactId>
+            <groupId>roramu.util</groupId>
+            <artifactId>time</artifactId>
             <version>${roramu.util.version}</version>
         </dependency>
 
