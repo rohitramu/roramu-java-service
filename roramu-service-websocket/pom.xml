@@ -5,7 +5,7 @@
     <parent>
         <groupId>roramu.service</groupId>
         <artifactId>roramu-service</artifactId>
-        <version>1.0</version>
+        <version>[0.0,999.0)</version>
     </parent>
 
     <groupId>roramu.service.websocket</groupId>
@@ -13,7 +13,7 @@
     <version>${buildVersion}</version>
 
     <dependencies>
-        <!-- roramu.service.status -->
+        <!-- roramu.service -->
         <dependency>
             <groupId>roramu.service.status</groupId>
             <artifactId>roramu-service-status</artifactId>
