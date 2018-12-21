@@ -5,23 +5,24 @@
     <parent>
         <groupId>roramu.service</groupId>
         <artifactId>roramu-service</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>roramu.service.status</groupId>
     <artifactId>roramu-service-status</artifactId>
+    <version>${buildVersion}</version>
 
     <dependencies>
         <!-- roramu.util -->
         <dependency>
             <groupId>roramu.util.net</groupId>
             <artifactId>roramu-util-net</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>roramu.util.time</groupId>
             <artifactId>roramu-util-time</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- GetHostName4J -->

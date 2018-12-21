@@ -5,40 +5,41 @@
     <parent>
         <groupId>roramu.service</groupId>
         <artifactId>roramu-service</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>roramu.service.websocket.jetty</groupId>
     <artifactId>roramu-service-websocket-jetty</artifactId>
+    <version>${buildVersion}</version>
 
     <dependencies>
-        <!-- roramu.util -->
-        <dependency>
-            <groupId>roramu.util.json</groupId>
-            <artifactId>roramu-util-json</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>roramu.util.string</groupId>
-            <artifactId>roramu-util-string</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>roramu.util.async</groupId>
-            <artifactId>roramu-util-async</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>roramu.util.exception</groupId>
-            <artifactId>roramu-util-exception</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
         <!-- roramu.service -->
         <dependency>
             <groupId>roramu.service.websocket</groupId>
             <artifactId>roramu-service-websocket</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${buildVersion}</version>
+        </dependency>
+
+        <!-- roramu.util -->
+        <dependency>
+            <groupId>roramu.util.json</groupId>
+            <artifactId>roramu-util-json</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.string</groupId>
+            <artifactId>roramu-util-string</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.async</groupId>
+            <artifactId>roramu-util-async</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.exception</groupId>
+            <artifactId>roramu-util-exception</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!-- JavaX -->

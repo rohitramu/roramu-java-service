@@ -56,7 +56,7 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
         if (config == null) {
             throw new NullPointerException("'config' cannot be null");
         }
-        NetworkUtils.validatePort(port, true);
+        NetworkUtils.validatePort(port);
 
         // TODO: Find a better way to select these values
 //        int corePoolSize = Runtime.getRuntime().availableProcessors();
