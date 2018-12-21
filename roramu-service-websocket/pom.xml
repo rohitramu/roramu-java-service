@@ -22,6 +22,16 @@
 
         <!-- roramu.util -->
         <dependency>
+            <groupId>roramu.util.time</groupId>
+            <artifactId>roramu-util-time</artifactId>
+            <version>${roramu.util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>roramu.util.reflection</groupId>
+            <artifactId>roramu-util-reflection</artifactId>
+            <version>${roramu.util.version}</version>
+        </dependency>
+        <dependency>
             <groupId>roramu.util.json</groupId>
             <artifactId>roramu-util-json</artifactId>
             <version>${roramu.util.version}</version>
