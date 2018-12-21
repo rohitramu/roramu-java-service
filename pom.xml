@@ -7,9 +7,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <buildVersion>1.0</buildVersion>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <buildVersion>1.0</buildVersion>
+
+        <roramu.util.version>[1.0,)</roramu.util.version>
     </properties>
 
     <modules>

@@ -17,12 +17,12 @@
         <dependency>
             <groupId>roramu.util.net</groupId>
             <artifactId>roramu-util-net</artifactId>
-            <version>1.0</version>
+            <version>${roramu.util.version}</version>
         </dependency>
         <dependency>
             <groupId>roramu.util.time</groupId>
             <artifactId>roramu-util-time</artifactId>
-            <version>1.0</version>
+            <version>${roramu.util.version}</version>
         </dependency>
 
         <!-- GetHostName4J -->

@@ -24,22 +24,22 @@
         <dependency>
             <groupId>roramu.util.json</groupId>
             <artifactId>roramu-util-json</artifactId>
-            <version>1.0</version>
+            <version>${roramu.util.version}</version>
         </dependency>
         <dependency>
             <groupId>roramu.util.string</groupId>
             <artifactId>roramu-util-string</artifactId>
-            <version>1.0</version>
+            <version>${roramu.util.version}</version>
         </dependency>
         <dependency>
             <groupId>roramu.util.async</groupId>
             <artifactId>roramu-util-async</artifactId>
-            <version>1.0</version>
+            <version>${roramu.util.version}</version>
         </dependency>
         <dependency>
             <groupId>roramu.util.exception</groupId>
             <artifactId>roramu-util-exception</artifactId>
-            <version>1.0</version>
+            <version>${roramu.util.version}</version>
         </dependency>
 
         <!-- JavaX -->
