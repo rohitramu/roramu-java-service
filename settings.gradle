@@ -1,0 +1,11 @@
+rootProject.name = 'root'
+
+Closure discoverSubprojects = {
+    def list = []
+    rootDir.eachDir(){ dir ->
+        dir.eachFileMatch({it == 'build.gradle'}, { list += [dir.name] })
+    }
+    list.toArray(new java.lang.String[0])
+}
+
+include discoverSubprojects()

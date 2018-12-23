@@ -26,6 +26,8 @@ public final class MessageType<Req, Res> {
      * {@link SimpleJsonConverter} implementation for request and response
      * objects.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param name The name of the message type.
      * @param requestType The request type reference. This should be referencing
      * an in-built Java type or a POJO, as it will be serialized and
@@ -35,6 +37,8 @@ public final class MessageType<Req, Res> {
      * referencing an in-built Java type or a POJO, as it will be serialized and
      * deserialized to/from JSON. If no response body is required for this
      * handler, {@link TypeInfo#VOID TypeInfo.VOID} should be used.
+     *
+     * @return The message type.
      */
     public static <Req, Res> MessageType<Req, Res> create(String name, TypeInfo<Req> requestType, TypeInfo<Res> responseType) {
         if (name == null) {
@@ -60,6 +64,8 @@ public final class MessageType<Req, Res> {
      * {@link SimpleJsonConverter} implementation for serializing and
      * deserializing request objects.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param name The name of the message type.
      * @param requestType The request type reference. This should be referencing
      * an in-built Java type or a POJO, as it will be serialized and
@@ -71,6 +77,8 @@ public final class MessageType<Req, Res> {
      * handler, {@link TypeInfo#VOID TypeInfo.VOID} should be used.
      * @param responseJsonConverter The JsonConverter that will be used to
      * serialize and deserialize response objects.
+     *
+     * @return The message type.
      */
     public static <Req, Res> MessageType<Req, Res> create(String name, TypeInfo<Req> requestType, TypeInfo<Res> responseType, JsonConverter<Res> responseJsonConverter) {
         if (name == null) {
@@ -98,6 +106,8 @@ public final class MessageType<Req, Res> {
      * {@link SimpleJsonConverter} implementation for serializing and
      * deserializing response objects.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param name The name of the message type.
      * @param requestType The request type reference. This should be referencing
      * an in-built Java type or a POJO, as it will be serialized and
@@ -109,6 +119,8 @@ public final class MessageType<Req, Res> {
      * referencing an in-built Java type or a POJO, as it will be serialized and
      * deserialized to/from JSON. If no request body is required for this
      * handler, {@link TypeInfo#VOID TypeInfo.VOID} should be used.
+     *
+     * @return The message type.
      */
     public static <Req, Res> MessageType<Req, Res> create(String name, TypeInfo<Req> requestType, JsonConverter<Req> requestJsonConverter, TypeInfo<Res> responseType) {
         if (name == null) {
@@ -136,11 +148,23 @@ public final class MessageType<Req, Res> {
      * when the request and response types are not correctly serialized or
      * deserialized by the {@link SimpleJsonConverter} implementation.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param name The name of the message type.
+     * @param requestType The request type reference. This should be referencing
+     * an in-built Java type or a POJO, as it will be serialized and
+     * deserialized to/from JSON. If no request body is required for this
+     * handler, {@link TypeInfo#VOID TypeInfo.VOID} should be used.
      * @param requestJsonConverter The JsonConverter that will be used to
      * serialize and deserialize request objects.
      * @param responseJsonConverter The JsonConverter that will be used to
      * serialize and deserialize response objects.
+     * @param responseType The request type reference. This should be
+     * referencing an in-built Java type or a POJO, as it will be serialized and
+     * deserialized to/from JSON. If no request body is required for this
+     * handler, {@link TypeInfo#VOID TypeInfo.VOID} should be used.
+     *
+     * @return The message type.
      */
     public static <Req, Res> MessageType<Req, Res> create(
         String name,

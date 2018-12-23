@@ -1,0 +1,7 @@
+dependencies {
+    implementation 'roramu.util:net:+'
+    implementation 'roramu.util:time:+'
+
+    // For getting status 
+    implementation 'com.kstruct:gethostname4j:0.0.2'
+}

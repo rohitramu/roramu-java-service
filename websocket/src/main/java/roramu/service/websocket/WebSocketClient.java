@@ -368,6 +368,8 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
     /**
      * Sends a message synchronously.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param messageType The message type.
      * @param messageBody The message body.
      */
@@ -399,6 +401,8 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * {@link #sendRequestAsync(MessageType, Object, long, TimeUnit)} method to
      * set a timeout.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param messageType The message type.
      * @param messageBody The message body.
      *
@@ -411,6 +415,8 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
     /**
      * Sends a message asynchronously.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param messageType The message type.
      * @param messageBody The JSON message body.
      * @param timeout How long to wait before giving up on the call and throwing
@@ -434,6 +440,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      *     {@link #sendRequestAsync(MessageType, Object)} method when possible.
      * </p>
      *
+     * @param <Res> The response type.
      * @param messageType The message type.
      * @param requestBody The JSON message body.
      * @param responseConverter The JsonConverter to use when deserializing the
@@ -453,6 +460,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      *     {@link #sendRequestAsync(MessageType, Object)} method when possible.
      * </p>
      *
+     * @param <Res> The response type.
      * @param messageType The message type.
      * @param requestBody The JSON message body.
      * @param responseConverter The JsonConverter to use when deserializing the
@@ -488,6 +496,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * {@link #sendRequest(MessageType, Object, long, TimeUnit)}
      * method to set a timeout.
      *
+     * @param <Req> The request type.
      * @param <Res> The response type.
      * @param messageType The message type.
      * @param requestBody The message body.
@@ -530,6 +539,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * Sends a request and waits for the response, using the specified timeout
      * period for awaiting the response.
      *
+     * @param <Req> The request type.
      * @param <Res> The response type.
      * @param messageType The message type.
      * @param requestBody The message body.

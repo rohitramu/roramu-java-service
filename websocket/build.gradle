@@ -1,0 +1,20 @@
+dependencies {
+    implementation project(':status')
+
+    // roramu.util
+    implementation 'roramu.util:time:+'
+    implementation 'roramu.util:reflection:+'
+    implementation 'roramu.util:json:+'
+    implementation 'roramu.util:string:+'
+    implementation 'roramu.util:async:+'
+    implementation 'roramu.util:exception:+'
+
+    // Apache commons-io
+    implementation 'commons-io:commons-io:2.6'
+
+    // WebSockets
+    api 'javax.websocket:javax.websocket-api:1.1'
+    
+    // Servlets
+    api 'javax.servlet:javax.servlet-api:4.0.0'
+}

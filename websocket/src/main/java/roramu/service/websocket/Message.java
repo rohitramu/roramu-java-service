@@ -1,7 +1,7 @@
 package roramu.service.websocket;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import roramu.util.json.JsonUtils;
+import roramu.util.json.RawJsonString;
 
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 public final class Message {
     private String requestId;
     private String messageType;
-    private String body;
+    private RawJsonString body;
     private Long sentMillis;
     private Long receivedMillis;
     private Long startProcessingMillis;
@@ -38,7 +38,7 @@ public final class Message {
     private Message(String requestId, String messageType, String jsonBody) {
         this.requestId = requestId;
         this.messageType = messageType;
-        this.body = jsonBody;
+        this.body = new RawJsonString(jsonBody);
     }
 
     /**
@@ -167,14 +167,13 @@ public final class Message {
         this.messageType = messageType;
     }
 
-    @JsonRawValue
     public final String getBody() {
-        return this.body;
+        return this.body.getValue();
     }
 
     private void setBody(Object body) {
         // It's ok to use JsonUtils directly here since it will not be exposed
-        this.body = JsonUtils.write(body);
+        this.body = new RawJsonString(JsonUtils.write(body));
     }
 
     public final Long getSentMillis() {

@@ -24,10 +24,14 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
     /**
      * Constructs a new TypedMessageHandler object.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param messageType The message type which defines the request/response
      * types as well as the converters to serialize/deserialize these types.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
+     *
+     * @return The message handler.
      */
     public static <Req, Res> TypedMessageHandler<Req, Res> create(MessageType<Req, Res> messageType, Function<Req, Res> handleTypedMessage) {
         if (messageType == null) {
@@ -49,10 +53,14 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * response types will use the {@link SimpleJsonConverter} to serialize and
      * deserialize requests/responses.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param requestType The type of object received in the request body.
      * @param responseType The type of object returned in the response body.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
+     *
+     * @return The message handler.
      */
     public static <Req, Res> TypedMessageHandler<Req, Res> create(TypeInfo<Req> requestType, TypeInfo<Res> responseType, Function<Req, Res> handleTypedMessage) {
         if (requestType == null) {
@@ -78,6 +86,8 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
     /**
      * Constructs a new TypedMessageHandler object.
      *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
      * @param requestType The type of object received in the request body.
      * @param requestJsonConverter The converter used to convert the request
      * body into the request object.
@@ -86,6 +96,8 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * object into the response body.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
+     *
+     * @return The message handler.
      */
     public static <Req, Res> TypedMessageHandler<Req, Res> create(
         TypeInfo<Req> requestType,
