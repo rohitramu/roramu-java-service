@@ -36,6 +36,6 @@ subprojects {
         classifier = 'javadoc'
     }
 
-    // Get external publishing behavior from a separate file (to allow for CI automation to provide different values)
+    // Get publishing behavior from a separate file (to allow for CI automation to provide different values)
     apply from: rootProject.file('publishing.gradle').absolutePath
 }

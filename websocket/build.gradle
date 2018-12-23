@@ -4,7 +4,7 @@ dependencies {
     // roramu.util
     implementation 'roramu.util:time:+'
     implementation 'roramu.util:reflection:+'
-    implementation 'roramu.util:json:+'
+    api 'roramu.util:json:+'
     implementation 'roramu.util:string:+'
     implementation 'roramu.util:async:+'
     implementation 'roramu.util:exception:+'
@@ -14,7 +14,7 @@ dependencies {
 
     // WebSockets
     api 'javax.websocket:javax.websocket-api:1.1'
-    
+
     // Servlets
     api 'javax.servlet:javax.servlet-api:4.0.0'
 }
