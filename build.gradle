@@ -27,11 +27,16 @@ subprojects {
     apply from: rootProject.file("$buildSettingsFolder/repositories.gradle").absolutePath
 
     dependencies {
-        testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.2'
-        testCompile 'org.junit.jupiter:junit-jupiter-params:5.3.2'
-        testCompile 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.3.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
     }
 
     // Get publishing behavior from a separate file (to allow for CI automation to provide different values)
     apply from: rootProject.file("$buildSettingsFolder/publishing.gradle").absolutePath
+
+    test {
+        // Enable JUnit Platform (a.k.a. JUnit 5) support
+        useJUnitPlatform()
+    }
 }
