@@ -2,6 +2,7 @@ package roramu.service.websocket;
 
 import roramu.util.json.JsonConverter;
 import roramu.util.json.JsonUtils;
+import roramu.util.json.RawJsonString;
 import roramu.util.reflection.TypeInfo;
 
 /**
@@ -93,7 +94,8 @@ public final class Response<T> {
             return null;
         }
 
-        SafeErrorDetails error = JsonUtils.read(message.getBody(), new TypeInfo<SafeErrorDetails>() {});
+        String errorBody = message.getBody() == null ? null : message.getBody().getValue();
+        SafeErrorDetails error = JsonUtils.read(errorBody, new TypeInfo<SafeErrorDetails>() {});
         return error;
     }
 
@@ -112,12 +114,12 @@ public final class Response<T> {
      *     or failure using the {@link Response#isSuccessful() } method.
      * </p>
      */
-    public final String getRawError() {
+    public final RawJsonString getRawError() {
         if (this.isSuccessful()) {
             return null;
         }
 
-        String error = message.getBody();
+        RawJsonString error = message.getBody();
         return error;
     }
 
@@ -136,7 +138,8 @@ public final class Response<T> {
         } catch (Exception ignored) {
             // Swallow the exception since we couldn't deserialize the response,
             // and just throw a new exception with the raw error as the message
-            throw new RuntimeException(this.getRawError());
+            RawJsonString error = this.getRawError();
+            throw new RuntimeException(error == null ? null : error.getValue());
         }
 
         return this;

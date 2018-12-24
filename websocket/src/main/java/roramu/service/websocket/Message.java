@@ -35,10 +35,10 @@ public final class Message {
      * @param messageType The type of message being sent.
      * @param jsonBody The JSON message body.
      */
-    private Message(String requestId, String messageType, String jsonBody) {
+    private Message(String requestId, String messageType, RawJsonString jsonBody) {
         this.requestId = requestId;
         this.messageType = messageType;
-        this.body = new RawJsonString(jsonBody);
+        this.body = jsonBody;
     }
 
     /**
@@ -51,7 +51,7 @@ public final class Message {
      *
      * @return The new message.
      */
-    public static final Message create(boolean isExpectingResponse, String messageType, String jsonBody) {
+    public static final Message create(boolean isExpectingResponse, String messageType, RawJsonString jsonBody) {
         if (MessageTypes.isError(messageType)) {
             throw new IllegalArgumentException("Use the 'createErrorResponse' method when creating an error response");
         }
@@ -76,7 +76,7 @@ public final class Message {
      *
      * @return The response to the given request message.
      */
-    public static final Message createSuccessResponse(Message request, String jsonResponse) {
+    public static final Message createSuccessResponse(Message request, RawJsonString jsonResponse) {
         if (request == null) {
             throw new NullPointerException("'request' cannot be null");
         }
@@ -143,7 +143,7 @@ public final class Message {
             causeMessage = cause.getMessage();
         }
         SafeErrorDetails exceptionDetails = new SafeErrorDetails(error.getMessage(), causeMessage, error.getStackTrace(), stackTraceDepth);
-        String exceptionJson = JsonUtils.write(exceptionDetails);
+        RawJsonString exceptionJson = new RawJsonString(JsonUtils.write(exceptionDetails));
 
         Message response = new Message(requestId, messageType, exceptionJson);
         response.setSentMillis(sentMillis);
@@ -167,8 +167,8 @@ public final class Message {
         this.messageType = messageType;
     }
 
-    public final String getBody() {
-        return this.body.getValue();
+    public final RawJsonString getBody() {
+        return this.body;
     }
 
     private void setBody(Object body) {

@@ -1,21 +1,15 @@
 package roramu.service.websocket.jetty;
 
-import roramu.service.websocket.WebSocketHandshakeFilter;
-import roramu.service.websocket.WebSocketService;
-import roramu.util.net.NetworkUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import roramu.service.websocket.WebSocketHandshakeFilter;
+import roramu.service.websocket.WebSocketService;
+import roramu.util.net.NetworkUtils;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.ServerContainer;
@@ -29,6 +23,8 @@ import java.util.EnumSet;
  * @param <T> The type which implements the service.
  */
 public final class JettyWebSocketServer<T extends WebSocketService> {
+    private static final String LOCALHOST_IP = "127.0.0.1";
+
     public Server start(Class<T> implementation, String route, int port) {
         return this.start(implementation, route, port, WebSocketService.getDefaultConfig(implementation, route));
     }
@@ -66,7 +62,10 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
 //        ThreadPool serverThreadPool = new QueuedThreadPool(maxPoolSize, corePoolSize, threadKeepAliveTime, new LinkedBlockingQueue<>(queueLength));
 //        Server server = new Server(serverThreadPool);
         Server server = new Server();
+
+        // Set up a connector to always use the localhost address
         ServerConnector connector = new ServerConnector(server);
+        connector.setHost(LOCALHOST_IP);
         connector.setPort(port);
         server.addConnector(connector);
 
@@ -90,12 +89,12 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
             server.start();
 
             System.out.println("Started Jetty WebSocket server at '" + server.getURI().toString() + "' using implementation '" + implementation.getName() + "'");
-
-            return server;
         } catch (Throwable thr) {
             // TODO: log
             throw new RuntimeException(thr);
         }
+
+        return server;
     }
 
     private Filter createFilter(WebSocketHandshakeFilter customFilter) {

@@ -1,5 +1,7 @@
 package roramu.service.websocket;
 
+import roramu.util.json.RawJsonString;
+
 /**
  * Contract for a message handler.
  *
@@ -14,5 +16,5 @@ public interface MessageHandler {
      *
      * @return The JSON response body.
      */
-    String handleMessage(String message);
+    RawJsonString handleMessage(RawJsonString message);
 }

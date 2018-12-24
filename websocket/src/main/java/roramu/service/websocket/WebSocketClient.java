@@ -3,6 +3,7 @@ package roramu.service.websocket;
 import roramu.util.async.AsyncUtils;
 import roramu.util.json.JsonConverter;
 import roramu.util.json.JsonUtils;
+import roramu.util.json.RawJsonString;
 import roramu.util.string.StringUtils;
 
 import javax.websocket.ClientEndpointConfig;
@@ -374,7 +375,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * @param messageBody The message body.
      */
     public final <Req, Res> void sendMessage(MessageType<Req, Res> messageType, Req messageBody) {
-        String jsonBody = messageType.getRequestJsonConverter().serialize(messageBody);
+        RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(messageBody);
         this.sendMessage(messageType.getName(), jsonBody);
     }
 
@@ -389,7 +390,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * @param messageType The message type.
      * @param messageBody The JSON message body.
      */
-    public final void sendMessage(String messageType, String messageBody) {
+    public final void sendMessage(String messageType, RawJsonString messageBody) {
         Message message = Message.create(false, messageType, messageBody);
 
         // Send the message
@@ -426,13 +427,13 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * @return The response.
      */
     public final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, Req messageBody, long timeout, TimeUnit timeoutUnits) {
-        String jsonBody = messageType.getRequestJsonConverter().serialize(messageBody);
+        RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(messageBody);
         return this.sendRequestAsync(messageType.getName(), jsonBody, messageType.getResponseJsonConverter(), timeout, timeoutUnits);
     }
 
     /**
      * Sends a message asynchronously. Use the
-     * {@link #sendRequestAsync(String, String, JsonConverter, long, TimeUnit)}
+     * {@link #sendRequestAsync(String, RawJsonString, JsonConverter, long, TimeUnit)}
      * method to set a timeout.
      * <p>
      *     NOTE: It is not recommended to use this overload unless the appropriate
@@ -448,7 +449,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      *
      * @return The deserialized response.
      */
-    public final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, String requestBody, JsonConverter<Res> responseConverter) {
+    public final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter) {
         return this.sendRequestAsync(messageType, requestBody, responseConverter, 0, null);
     }
 
@@ -471,7 +472,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      *
      * @return The deserialized response.
      */
-    public final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, String requestBody, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
+    public final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
         if (messageType == null) {
             throw new NullPointerException("'messageType' cannot be null");
         }
@@ -504,14 +505,14 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * @return The response.
      */
     public final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, Req requestBody) {
-        String jsonBody = messageType.getRequestJsonConverter().serialize(requestBody);
+        RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(requestBody);
         return this.sendRequest(messageType.getName(), jsonBody, messageType.getResponseJsonConverter());
     }
 
     /**
      * Sends a request and waits for the response. This method will block
      * indefinitely until a response is received. Use the
-     * {@link #sendRequest(String, String, JsonConverter, long, TimeUnit)}
+     * {@link #sendRequest(String, RawJsonString, JsonConverter, long, TimeUnit)}
      * method to set a timeout.
      * <p>
      *     NOTE: It is not recommended to use this overload unless the
@@ -527,7 +528,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      *
      * @return The response.
      */
-    public final <Res> Response<Res> sendRequest(String messageType, String requestBody, JsonConverter<Res> responseConverter) {
+    public final <Res> Response<Res> sendRequest(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter) {
         return this.sendRequest(
             messageType,
             requestBody,
@@ -549,7 +550,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      * @return The response.
      */
     public final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, Req requestBody, long timeout, TimeUnit timeoutUnits) {
-        String jsonBody = messageType.getRequestJsonConverter().serialize(requestBody);
+        RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(requestBody);
         return this.sendRequest(messageType.getName(), jsonBody, messageType.getResponseJsonConverter(), timeout, timeoutUnits);
     }
 
@@ -573,7 +574,7 @@ public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable 
      *
      * @return The response.
      */
-    public final <Res> Response<Res> sendRequest(String messageType, String requestBody, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
+    public final <Res> Response<Res> sendRequest(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
         if (messageType == null) {
             throw new NullPointerException("'messageType' cannot be null");
         }

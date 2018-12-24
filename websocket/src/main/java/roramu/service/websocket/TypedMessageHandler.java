@@ -1,6 +1,7 @@
 package roramu.service.websocket;
 
 import roramu.util.json.JsonConverter;
+import roramu.util.json.RawJsonString;
 import roramu.util.json.SimpleJsonConverter;
 import roramu.util.reflection.TypeInfo;
 
@@ -171,7 +172,7 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
     }
 
     @Override
-    public final String handleMessage(String message) {
+    public final RawJsonString handleMessage(RawJsonString message) {
         Req request;
         if (message == null) {
             request = null;
@@ -180,7 +181,7 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
         }
 
         Res response = this.handleTypedMessage(request);
-        String jsonResponse = this.responseJsonConverter.serialize(response);
+        RawJsonString jsonResponse = this.responseJsonConverter.serialize(response);
 
         return jsonResponse;
     }

@@ -2,9 +2,9 @@ dependencies {
     implementation project(':status')
 
     // roramu.util
+    api 'roramu.util:json:+'
     implementation 'roramu.util:time:+'
     implementation 'roramu.util:reflection:+'
-    api 'roramu.util:json:+'
     implementation 'roramu.util:string:+'
     implementation 'roramu.util:async:+'
     implementation 'roramu.util:exception:+'

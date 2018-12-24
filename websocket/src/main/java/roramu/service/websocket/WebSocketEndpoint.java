@@ -2,6 +2,7 @@ package roramu.service.websocket;
 
 import roramu.util.exception.ExceptionUtils;
 import roramu.util.json.JsonUtils;
+import roramu.util.json.RawJsonString;
 import roramu.util.reflection.TypeInfo;
 import roramu.util.string.StringUtils;
 import roramu.util.time.TimeUtils;
@@ -146,7 +147,7 @@ public abstract class WebSocketEndpoint extends Endpoint {
 
                 // Process the message
                 MessageHandler handler = this.getMessageHandlers().get(messageType);
-                String response = handler.handleMessage(message.getBody());
+                RawJsonString response = handler.handleMessage(message.getBody());
 
                 // If the client is expecting a response, send one back
                 if (message.isExpectingResponse()) {
