@@ -1,4 +1,4 @@
-rootProject.name = 'root'
+rootProject.name = 'service-root'
 
 fileTree('.') {
     include '**/build.gradle'

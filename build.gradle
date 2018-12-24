@@ -5,8 +5,14 @@ def buildVersion = '1.0'
 
 def currentVersion = "${buildVersion}.${rootProject.buildRevision}"
 
+def buildSettingsFolder = 'build_settings'
+
 println "Build version: $currentVersion"
 println "Gradle wrapper version: ${wrapper.gradleVersion}"
+
+buildscript { scriptHandler ->
+    apply from: "$buildSettingsFolder/buildscript_repositories.gradle", to: scriptHandler
+}
 
 allprojects {
     group = 'roramu.service'
@@ -18,7 +24,7 @@ subprojects {
     apply plugin: 'maven-publish'
 
     // Get external repositories from a separate file (to allow for CI automation to provide different values)
-    apply from: rootProject.file('repositories.gradle').absolutePath
+    apply from: rootProject.file("$buildSettingsFolder/repositories.gradle").absolutePath
 
     dependencies {
         testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.2'
@@ -37,5 +43,5 @@ subprojects {
     }
 
     // Get publishing behavior from a separate file (to allow for CI automation to provide different values)
-    apply from: rootProject.file('publishing.gradle').absolutePath
+    apply from: rootProject.file("$buildSettingsFolder/publishing.gradle").absolutePath
 }
