@@ -20,39 +20,75 @@ import java.util.EnumSet;
 /**
  * An instance of a service running on an embedded Jetty server.
  *
- * @param <T> The type which implements the service.
+ * @param <T> The type which implements a {@link WebSocketService}.
  */
 public final class JettyWebSocketServer<T extends WebSocketService> {
     private static final String LOCALHOST_IP = "127.0.0.1";
 
-    public Server start(Class<T> implementation, String route, int port) {
-        return this.start(implementation, route, port, WebSocketService.getDefaultConfig(implementation, route));
-    }
-
-    public Server start(Class<T> implementation, String route, int port, WebSocketHandshakeFilter handshakeFilter) {
-        return this.start(implementation, route, port, WebSocketService.getDefaultConfig(implementation, route), handshakeFilter);
-    }
-
-    public Server start(Class<T> implementation, String route, int port, ServerEndpointConfig.Configurator configurator) {
-        return this.start(implementation, route, port, WebSocketService.getDefaultConfig(implementation, route, configurator), null);
-    }
-
-    public Server start(Class<T> implementation, String route, int port, ServerEndpointConfig config) {
-        return this.start(implementation, route, port, config, null);
-    }
-
-    public Server start(Class<T> implementation, String route, int port, ServerEndpointConfig.Configurator configurator, WebSocketHandshakeFilter handshakeFilter) {
-        return this.start(implementation, route, port, WebSocketService.getDefaultConfig(implementation, route, configurator), handshakeFilter);
-    }
-
-    public Server start(Class<T> implementation, String route, int port, ServerEndpointConfig config, WebSocketHandshakeFilter handshakeFilter) {
+    public Server start(String route, int port, Class<T> implementation) {
+        if (route == null) {
+            throw new IllegalArgumentException("'route' cannot be null");
+        }
         if (implementation == null) {
             throw new NullPointerException("'implementation' cannot be null");
         }
-        if (config == null) {
-            throw new NullPointerException("'config' cannot be null");
+        return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route));
+    }
+
+    public Server start(String route, int port, Class<T> implementation, WebSocketHandshakeFilter handshakeFilter) {
+        if (implementation == null) {
+            throw new NullPointerException("'implementation' cannot be null");
         }
-        NetworkUtils.validatePort(port);
+        return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route), handshakeFilter);
+    }
+
+    public Server start(String route, int port, Class<T> implementation, ServerEndpointConfig.Configurator configurator) {
+        if (implementation == null) {
+            throw new NullPointerException("'implementation' cannot be null");
+        }
+        return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route, configurator), null);
+    }
+
+    public Server start(String route, int port, ServerEndpointConfig config) {
+        if (route == null) {
+            throw new IllegalArgumentException("'route' cannot be null");
+        }
+        if (config == null) {
+            throw new IllegalArgumentException("'config' cannot be null");
+        }
+        return this.start(route, port, config, null);
+    }
+
+    public Server start(Class<T> implementation, String route, int port, ServerEndpointConfig.Configurator configurator, WebSocketHandshakeFilter handshakeFilter) {
+        if (route == null) {
+            throw new IllegalArgumentException("'route' cannot be null");
+        }
+        if (implementation == null) {
+            throw new NullPointerException("'implementation' cannot be null");
+        }
+        return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route, configurator), handshakeFilter);
+    }
+
+    /**
+     * Starts a {@link WebSocketService} and returns the {@link Server} instance.
+     * @param route The route that the service will be exposed on.
+     * @param port The port that the server should listen on.  If this is null, a randomly allocated ephemeral port is used.
+     * @param config The server's config.
+     * @param handshakeFilter The handshake filter.
+     * @return The {@link Server} instance that the service is running in.
+     */
+    public Server start(String route, Integer port, ServerEndpointConfig config, WebSocketHandshakeFilter handshakeFilter) {
+        if (route == null) {
+            throw new IllegalArgumentException("'route' cannot be null");
+        }
+        if (config == null) {
+            throw new IllegalArgumentException("'config' cannot be null");
+        }
+        if (port == null) {
+            port = 0;
+        } else {
+            NetworkUtils.validatePort(port);
+        }
 
         // TODO: Find a better way to select these values
 //        int corePoolSize = Runtime.getRuntime().availableProcessors();
@@ -88,7 +124,7 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
 
             server.start();
 
-            System.out.println("Started Jetty WebSocket server at '" + server.getURI().toString() + "' using implementation '" + implementation.getName() + "'");
+            System.out.println("Started Jetty WebSocket server at '" + server.getURI().toString() + "' using service implementation '" + config.getEndpointClass().getName() + "'");
         } catch (Throwable thr) {
             // TODO: log
             throw new RuntimeException(thr);

@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The base type representing a service.
+ * The base type representing a WebSocket service.
  */
 public abstract class WebSocketService extends WebSocketEndpoint {
     // Keep-alive task

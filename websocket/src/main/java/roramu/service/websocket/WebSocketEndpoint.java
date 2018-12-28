@@ -80,6 +80,10 @@ public abstract class WebSocketEndpoint extends Endpoint {
      *     handlers (e.g. the "STATUS" and "ERROR" message handlers).
      * </p>
      *
+     * It is recommended that the {@link MessageHandler} objects returned from
+     * this method are first declared as static variables outside the method to
+     * prevent them being recreated for every connection.
+     *
      * @return The message handlers. This method should never return null.
      */
     protected Map<String, MessageHandler> createMessageHandlers() {
