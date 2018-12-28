@@ -24,6 +24,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A WebSocket client.
+ *
+ * Service implementations should extend this class to provide implementation-specific methods for interacting with the
+ * service's APIs.
  */
 public class WebSocketClient extends WebSocketEndpoint implements AutoCloseable {
     // TODO: Connect to dependencies when locations are updated
