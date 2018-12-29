@@ -133,13 +133,13 @@ public final class Response<T> {
         try {
             SafeErrorDetails thr = this.getError();
             if (thr != null) {
-                throw new RuntimeException(thr.getError(), new RuntimeException(String.join("\n", thr.getReasons())));
+                throw new WebSocketRequestException(thr.getError(), new RuntimeException(String.join("\n", thr.getReasons())));
             }
         } catch (Exception ignored) {
             // Swallow the exception since we couldn't deserialize the response,
             // and just throw a new exception with the raw error as the message
             RawJsonString error = this.getRawError();
-            throw new RuntimeException(error == null ? null : error.getValue());
+            throw new WebSocketRequestException(error == null ? null : error.getValue());
         }
 
         return this;
