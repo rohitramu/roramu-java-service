@@ -6,6 +6,7 @@ import roramu.util.json.SimpleJsonConverter;
 import roramu.util.reflection.TypeInfo;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * A message handler which accepts JSON requests and returns JSON responses.
@@ -14,6 +15,8 @@ import java.util.function.Function;
  * @param <Res> The response type.
  */
 public final class TypedMessageHandler<Req, Res> implements MessageHandler {
+    private static final SimpleJsonConverter<Void> JSON_CONVERTER_VOID = new SimpleJsonConverter<>(TypeInfo.VOID);
+
     private TypeInfo<Req> requestType;
     private TypeInfo<Res> responseType;
     private JsonConverter<Req> requestJsonConverter;
@@ -21,6 +24,32 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
     private Function<Req, Res> handleTypedMessage;
 
     private TypedMessageHandler() {}
+
+    /**
+     * Constructs a new TypedMessageHandler object for methods that don't
+     * require a request body.
+     *
+     * @param <Res> The response type.
+     * @param messageType The message type which defines the request/response
+     * types as well as the converters to serialize/deserialize these types.
+     * @param handleTypedMessage The function to handle the deserialized
+     * message.
+     *
+     * @return The message handler.
+     */
+    public static <Res> TypedMessageHandler<Void, Res> create(MessageType<Void, Res> messageType, Supplier<Res> handleTypedMessage) {
+        if (messageType == null) {
+            throw new NullPointerException("'messageType' cannot be null");
+        }
+        if (handleTypedMessage == null) {
+            throw new NullPointerException("'handleTypedMessage' cannot be null");
+        }
+
+        // Convert the supplier into a function with an unused Void parameter
+        return create(
+            messageType,
+            (Void notUsed) -> handleTypedMessage.get());
+    }
 
     /**
      * Constructs a new TypedMessageHandler object.
@@ -45,8 +74,34 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
         return create(
             messageType.getRequestType(), messageType.getRequestJsonConverter(),
             messageType.getResponseType(), messageType.getResponseJsonConverter(),
-            handleTypedMessage
-        );
+            handleTypedMessage);
+    }
+
+    /**
+     * Constructs a new TypedMessageHandler object for methods that don't require
+     * a request body. Both the request and response types will use the
+     * {@link SimpleJsonConverter} to serialize and deserialize requests/responses.
+     *
+     * @param <Res> The response type.
+     * @param responseType The type of object returned in the response body.
+     * @param handleTypedMessage The function to handle the deserialized
+     * message.
+     *
+     * @return The message handler.
+     */
+    public static <Res> TypedMessageHandler<Void, Res> create(TypeInfo<Res> responseType, Supplier<Res> handleTypedMessage) {
+        if (responseType == null) {
+            throw new NullPointerException("'responseType' cannot be null");
+        }
+        if (handleTypedMessage == null) {
+            throw new NullPointerException("'handleTypedMessage' cannot be null");
+        }
+
+        // Convert the supplier into a function with an unused Void parameter
+        return create(
+                TypeInfo.VOID,
+                responseType,
+                (Void notUsed) -> handleTypedMessage.get());
     }
 
     /**
@@ -80,8 +135,42 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
         return create(
             requestType, requestJsonConverter,
             responseType, responseJsonConverter,
-            handleTypedMessage
-        );
+            handleTypedMessage);
+    }
+
+    /**
+     * Constructs a new TypedMessageHandler object.
+     *
+     * @param <Res> The response type.
+     * @param responseType The type of object returned in the response body.
+     * @param responseJsonConverter The converter used to convert the response
+     * object into the response body.
+     * @param handleTypedMessage The function to handle the deserialized
+     * message.
+     *
+     * @return The message handler.
+     */
+    public static <Res> TypedMessageHandler<Void, Res> create(
+            TypeInfo<Res> responseType,
+            JsonConverter<Res> responseJsonConverter,
+            Supplier<Res> handleTypedMessage
+    ) {
+        if (responseType == null) {
+            throw new NullPointerException("'responseType' cannot be null");
+        }
+        if (responseJsonConverter == null) {
+            throw new NullPointerException("'responseJsonConverter' cannot be null");
+        }
+        if (handleTypedMessage == null) {
+            throw new NullPointerException("'handleTypedMessage' cannot be null");
+        }
+
+        return create(
+            TypeInfo.VOID,
+            JSON_CONVERTER_VOID,
+            responseType,
+            responseJsonConverter,
+            (Void notUsed) -> handleTypedMessage.get());
     }
 
     /**
