@@ -401,6 +401,21 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     }
 
     /**
+     * Sends a message asynchronously without a message body. Use the
+     * {@link #sendRequestAsync(MessageType, long, TimeUnit)} method to
+     * set a timeout.
+     *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     *
+     * @return The response.
+     */
+    protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType) {
+        return this.sendRequestAsync(messageType, null);
+    }
+
+    /**
      * Sends a message asynchronously. Use the
      * {@link #sendRequestAsync(MessageType, Object, long, TimeUnit)} method to
      * set a timeout.
@@ -414,6 +429,22 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      */
     protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, Req messageBody) {
         return this.sendRequestAsync(messageType, messageBody, 0, null);
+    }
+
+    /**
+     * Sends a message asynchronously without a message body.
+     *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     * @param timeout How long to wait before giving up on the call and throwing
+     * an exception. Set this to zero to disable the timeout.
+     * @param timeoutUnits The units for the timeout.
+     *
+     * @return The response.
+     */
+    protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, long timeout, TimeUnit timeoutUnits) {
+        return this.sendRequestAsync(messageType, null, timeout, timeoutUnits);
     }
 
     /**
@@ -432,6 +463,27 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, Req messageBody, long timeout, TimeUnit timeoutUnits) {
         RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(messageBody);
         return this.sendRequestAsync(messageType.getName(), jsonBody, messageType.getResponseJsonConverter(), timeout, timeoutUnits);
+    }
+
+    /**
+     * Sends a message asynchronously without a message body. Use the
+     * {@link #sendRequestAsync(String, JsonConverter, long, TimeUnit)}
+     * method to set a timeout.
+     * <p>
+     *     NOTE: It is not recommended to use this overload unless the appropriate
+     *     {@link MessageType} is not available. Use the
+     *     {@link #sendRequestAsync(MessageType, Object)} method when possible.
+     * </p>
+     *
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     * @param responseConverter The JsonConverter to use when deserializing the
+     * response.
+     *
+     * @return The deserialized response.
+     */
+    protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, JsonConverter<Res> responseConverter) {
+        return this.sendRequestAsync(messageType, null, responseConverter, 0, null);
     }
 
     /**
@@ -454,6 +506,28 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      */
     protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter) {
         return this.sendRequestAsync(messageType, requestBody, responseConverter, 0, null);
+    }
+
+    /**
+     * Sends a message asynchronously without a message body.
+     * <p>
+     *     NOTE: It is not recommended to use this overload unless the
+     *     appropriate {@link MessageType} is not available. Use the
+     *     {@link #sendRequestAsync(MessageType)} method when possible.
+     * </p>
+     *
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     * @param responseConverter The JsonConverter to use when deserializing the
+     * response.
+     * @param timeout How long to wait before giving up on the call and throwing
+     * an exception. Set this to zero to disable the timeout.
+     * @param timeoutUnits The units for the timeout.
+     *
+     * @return The deserialized response.
+     */
+    protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
+        return this.sendRequestAsync(messageType, null, responseConverter, timeout, timeoutUnits);
     }
 
     /**
@@ -495,6 +569,22 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     }
 
     /**
+     * Sends a request without a message body and waits for the response.
+     * This method will block indefinitely until a response is received.
+     * Use the {@link #sendRequest(MessageType, long, TimeUnit)} method
+     * to set a timeout.
+     *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     *
+     * @return The response.
+     */
+    protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType) {
+        return this.sendRequest(messageType, null);
+    }
+
+    /**
      * Sends a request and waits for the response. This method will block
      * indefinitely until a response is received. Use the
      * {@link #sendRequest(MessageType, Object, long, TimeUnit)}
@@ -510,6 +600,28 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, Req requestBody) {
         RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(requestBody);
         return this.sendRequest(messageType.getName(), jsonBody, messageType.getResponseJsonConverter());
+    }
+
+    /**
+     * Sends a request without a message body and waits for the response.
+     * This method will block indefinitely until a response is received.
+     * Use the {@link #sendRequest(String, JsonConverter, long, TimeUnit)}
+     * method to set a timeout.
+     * <p>
+     *     NOTE: It is not recommended to use this overload unless the
+     *     appropriate {@link MessageType} is not available. Use the
+     *     {@link #sendRequest(MessageType)} method when possible.
+     * </p>
+     *
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     * @param responseConverter The JsonConverter to use when deserializing the
+     * response.
+     *
+     * @return The response.
+     */
+    protected final <Res> Response<Res> sendRequest(String messageType, JsonConverter<Res> responseConverter) {
+        return this.sendRequest(messageType, null, responseConverter);
     }
 
     /**
@@ -540,6 +652,22 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     }
 
     /**
+     * Sends a request without a message body and waits for the response, using the
+     * specified timeout period for awaiting the response.
+     *
+     * @param <Req> The request type.
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     * @param timeout The timeout.
+     * @param timeoutUnits The timeout units.
+     *
+     * @return The response.
+     */
+    protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, long timeout, TimeUnit timeoutUnits) {
+        return this.sendRequest(messageType, null, timeout, timeoutUnits);
+    }
+
+    /**
      * Sends a request and waits for the response, using the specified timeout
      * period for awaiting the response.
      *
@@ -555,6 +683,29 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, Req requestBody, long timeout, TimeUnit timeoutUnits) {
         RawJsonString jsonBody = messageType.getRequestJsonConverter().serialize(requestBody);
         return this.sendRequest(messageType.getName(), jsonBody, messageType.getResponseJsonConverter(), timeout, timeoutUnits);
+    }
+
+    /**
+     * Sends a request without a message body and waits for the response,
+     * using the specified timeout period for awaiting the response.
+     * <p>
+     *     NOTE: It is not recommended to use this overload unless the
+     *     appropriate {@link MessageType} is not available. Instead, use the
+     *     {@link #sendRequest(MessageType, long, TimeUnit)}
+     *     method when possible.
+     * </p>
+     *
+     * @param <Res> The response type.
+     * @param messageType The message type.
+     * @param responseConverter The JsonConverter to use when deserializing the
+     * response.
+     * @param timeout The timeout.
+     * @param timeoutUnits The timeout units.
+     *
+     * @return The response.
+     */
+    protected final <Res> Response<Res> sendRequest(String messageType, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
+        return this.sendRequest(messageType, null, responseConverter, timeout, timeoutUnits);
     }
 
     /**
