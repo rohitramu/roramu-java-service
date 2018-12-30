@@ -12,6 +12,10 @@ println "Gradle wrapper version: ${wrapper.gradleVersion}"
 
 buildscript { scriptHandler ->
     apply from: "$buildSettingsFolder/buildscript_repositories.gradle", to: scriptHandler
+
+    dependencies {
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:+'
+    }
 }
 
 allprojects {
@@ -21,7 +25,7 @@ allprojects {
 
 subprojects {
     apply plugin: 'java-library'
-    apply plugin: 'maven-publish'
+    apply plugin: 'nebula.maven-publish'
 
     // Get external repositories from a separate file (to allow for CI automation to provide different values)
     apply from: rootProject.file("$buildSettingsFolder/repositories.gradle").absolutePath
