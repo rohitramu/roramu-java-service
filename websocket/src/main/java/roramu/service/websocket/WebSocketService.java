@@ -82,7 +82,6 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * @param impl The implementing service.
      * @param path The path of the service (must start with a '{@code /}'
      * character).
-     *
      * @return The configuration.
      */
     public static final ServerEndpointConfig getDefaultConfig(Class<? extends WebSocketService> impl, String path) {
@@ -99,7 +98,6 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * @param configurator The configurator implementation to be used in the
      * configuration. A configurator is most commonly used to intercept the
      * WebSocket handshake.
-     *
      * @return The configuration.
      */
     public static final ServerEndpointConfig getDefaultConfig(Class<? extends WebSocketService> impl, String path, ServerEndpointConfig.Configurator configurator) {
@@ -124,6 +122,13 @@ public abstract class WebSocketService extends WebSocketEndpoint {
             .subprotocols(Collections.singletonList("json"));
     }
 
+    /**
+     * Creates the message handlers for the service.  Subclasses should call
+     * {@code super.createMessageHandlers()} to obtain the map instead of
+     * constructing their own.
+     *
+     * @return The message handlers for the service.
+     */
     @Override
     protected Map<String, MessageHandler> createMessageHandlers() {
         Map<String, MessageHandler> handlers = super.createMessageHandlers();
@@ -142,7 +147,6 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * request data.
      *
      * @param requestData The request data.
-     *
      * @return The extra status information.
      */
     public Object processStatusRequest(Object requestData) {
@@ -166,7 +170,6 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * Sends a message to all connected sessions.
      *
      * @param message The message to send.
-     *
      * @return The session IDs mapped to their respective task for sending the
      * message.
      */
@@ -275,7 +278,8 @@ public abstract class WebSocketService extends WebSocketEndpoint {
             WebSocketService::keepAlive,
             WebSocketService.PING_FREQUENCY,
             WebSocketService.PING_FREQUENCY,
-            WebSocketService.PING_FREQUENCY_TIME_UNIT);
+            WebSocketService.PING_FREQUENCY_TIME_UNIT
+        );
     }
 
     /**

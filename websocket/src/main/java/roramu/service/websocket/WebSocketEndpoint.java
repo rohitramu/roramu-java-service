@@ -1,12 +1,12 @@
 package roramu.service.websocket;
 
+import org.apache.commons.io.IOUtils;
 import roramu.util.exception.ExceptionUtils;
 import roramu.util.json.JsonUtils;
 import roramu.util.json.RawJsonString;
 import roramu.util.reflection.TypeInfo;
 import roramu.util.string.StringUtils;
 import roramu.util.time.TimeUtils;
-import org.apache.commons.io.IOUtils;
 
 import javax.websocket.CloseReason;
 import javax.websocket.DecodeException;
@@ -30,9 +30,9 @@ import java.util.concurrent.ExecutionException;
 /**
  * Defines a WebSocket endpoint which can handle multiple types of messages.
  * <p>
- *     NOTE: Every subclass that defines a constructor MUST ALSO define a
- *     default constructor. This allows instances of this class to be created
- *     during deployment. The default constructor may be private.
+ * NOTE: Every subclass that defines a constructor MUST ALSO define a
+ * default constructor. This allows instances of this class to be created
+ * during deployment. The default constructor may be private.
  * </p>
  */
 public abstract class WebSocketEndpoint extends Endpoint {
@@ -75,11 +75,11 @@ public abstract class WebSocketEndpoint extends Endpoint {
      * empty map if specialized message handlers are not required (e.g. in the
      * case of simple clients).
      * <p>
-     *     NOTE: Implementations should first call
-     *     {@code super.createMessageHandlers()} to get the default message
-     *     handlers (e.g. the "STATUS" and "ERROR" message handlers).
+     * NOTE: Implementations should first call
+     * {@code super.createMessageHandlers()} to get the default message
+     * handlers (e.g. the "STATUS" and "ERROR" message handlers).
      * </p>
-     *
+     * <p>
      * It is recommended that the {@link MessageHandler} objects returned from
      * this method are first declared as static variables outside the method to
      * prevent them being recreated for every connection.
@@ -231,7 +231,6 @@ public abstract class WebSocketEndpoint extends Endpoint {
      * Serializes a message into a JSON string.
      *
      * @param message The message to serialize.
-     *
      * @return The JSON string representing the message.
      */
     private static String serializeMessage(Message message) {
@@ -249,7 +248,6 @@ public abstract class WebSocketEndpoint extends Endpoint {
      * Logic to run before a session is opened (e.g. validation).
      *
      * @param session The session that will be opened.
-     *
      * @return The {@link CloseReason} if the session should be rejected,
      * otherwise null.
      */

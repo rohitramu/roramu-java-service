@@ -34,7 +34,6 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * types as well as the converters to serialize/deserialize these types.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
-     *
      * @return The message handler.
      */
     public static <Res> TypedMessageHandler<Void, Res> create(MessageType<Void, Res> messageType, Supplier<Res> handleTypedMessage) {
@@ -48,7 +47,8 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
         // Convert the supplier into a function with an unused Void parameter
         return create(
             messageType,
-            (Void notUsed) -> handleTypedMessage.get());
+            (Void notUsed) -> handleTypedMessage.get()
+        );
     }
 
     /**
@@ -60,7 +60,6 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * types as well as the converters to serialize/deserialize these types.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
-     *
      * @return The message handler.
      */
     public static <Req, Res> TypedMessageHandler<Req, Res> create(MessageType<Req, Res> messageType, Function<Req, Res> handleTypedMessage) {
@@ -74,7 +73,8 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
         return create(
             messageType.getRequestType(), messageType.getRequestJsonConverter(),
             messageType.getResponseType(), messageType.getResponseJsonConverter(),
-            handleTypedMessage);
+            handleTypedMessage
+        );
     }
 
     /**
@@ -86,7 +86,6 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * @param responseType The type of object returned in the response body.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
-     *
      * @return The message handler.
      */
     public static <Res> TypedMessageHandler<Void, Res> create(TypeInfo<Res> responseType, Supplier<Res> handleTypedMessage) {
@@ -99,9 +98,10 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
 
         // Convert the supplier into a function with an unused Void parameter
         return create(
-                TypeInfo.VOID,
-                responseType,
-                (Void notUsed) -> handleTypedMessage.get());
+            TypeInfo.VOID,
+            responseType,
+            (Void notUsed) -> handleTypedMessage.get()
+        );
     }
 
     /**
@@ -115,7 +115,6 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * @param responseType The type of object returned in the response body.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
-     *
      * @return The message handler.
      */
     public static <Req, Res> TypedMessageHandler<Req, Res> create(TypeInfo<Req> requestType, TypeInfo<Res> responseType, Function<Req, Res> handleTypedMessage) {
@@ -135,7 +134,8 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
         return create(
             requestType, requestJsonConverter,
             responseType, responseJsonConverter,
-            handleTypedMessage);
+            handleTypedMessage
+        );
     }
 
     /**
@@ -147,13 +147,12 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * object into the response body.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
-     *
      * @return The message handler.
      */
     public static <Res> TypedMessageHandler<Void, Res> create(
-            TypeInfo<Res> responseType,
-            JsonConverter<Res> responseJsonConverter,
-            Supplier<Res> handleTypedMessage
+        TypeInfo<Res> responseType,
+        JsonConverter<Res> responseJsonConverter,
+        Supplier<Res> handleTypedMessage
     ) {
         if (responseType == null) {
             throw new NullPointerException("'responseType' cannot be null");
@@ -170,7 +169,8 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
             JSON_CONVERTER_VOID,
             responseType,
             responseJsonConverter,
-            (Void notUsed) -> handleTypedMessage.get());
+            (Void notUsed) -> handleTypedMessage.get()
+        );
     }
 
     /**
@@ -186,7 +186,6 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * object into the response body.
      * @param handleTypedMessage The function to handle the deserialized
      * message.
-     *
      * @return The message handler.
      */
     public static <Req, Res> TypedMessageHandler<Req, Res> create(
@@ -279,7 +278,6 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
      * Handles a deserialized request body.
      *
      * @param request The deserialized request body.
-     *
      * @return The response.
      */
     public final Res handleTypedMessage(Req request) {

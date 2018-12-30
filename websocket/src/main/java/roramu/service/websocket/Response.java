@@ -63,7 +63,7 @@ public final class Response<T> {
      *
      * @return The response contents if the message represents a successful
      * response, otherwise null.
-     *
+     * <p>
      * NOTE: Do not rely on a null response for determining an error - the
      * successful response itself may be a null value. Instead, check for
      * success or failure using the {@link Response#isSuccessful() } method.
@@ -84,7 +84,7 @@ public final class Response<T> {
      *
      * @return The error if the message represents an error response, otherwise
      * null.
-     *
+     * <p>
      * NOTE: Do not rely on a null response for determining success - the error
      * response itself may be a null value. Instead, check for success or
      * failure using the {@link Response#isSuccessful() } method.
@@ -109,9 +109,9 @@ public final class Response<T> {
      * @return The error if the message represents an error response, otherwise
      * null.
      * <p>
-     *     NOTE: Do not rely on a null response for determining success - the
-     *     error response itself may be a null value. Instead, check for success
-     *     or failure using the {@link Response#isSuccessful() } method.
+     * NOTE: Do not rely on a null response for determining success - the
+     * error response itself may be a null value. Instead, check for success
+     * or failure using the {@link Response#isSuccessful() } method.
      * </p>
      */
     public final RawJsonString getRawError() {

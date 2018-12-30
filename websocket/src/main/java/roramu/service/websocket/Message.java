@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * Represents a message which can be sent between services.
- *
+ * <p>
  * TODO: javadoc comments for property getters and setters
  */
 public final class Message {
@@ -48,7 +48,6 @@ public final class Message {
      * acknowledgment from the service it calls.
      * @param messageType The type of message being sent.
      * @param jsonBody The JSON message body.
-     *
      * @return The new message.
      */
     public static final Message create(boolean isExpectingResponse, String messageType, RawJsonString jsonBody) {
@@ -73,7 +72,6 @@ public final class Message {
      *
      * @param request The request message to create a response to.
      * @param jsonResponse The JSON body of the response.
-     *
      * @return The response to the given request message.
      */
     public static final Message createSuccessResponse(Message request, RawJsonString jsonResponse) {
@@ -96,7 +94,6 @@ public final class Message {
      * Create a message that can be sent to indicate an error.
      *
      * @param error The error response.
-     *
      * @return The error response message.
      */
     public static final Message createErrorResponse(Throwable error) {
@@ -109,7 +106,6 @@ public final class Message {
      *
      * @param request The request message to create an error response to.
      * @param error The error response.
-     *
      * @return The error response to the given request message.
      */
     public static final Message createErrorResponse(Message request, Throwable error) {
@@ -124,7 +120,6 @@ public final class Message {
      * @param error The error response.
      * @param stackTraceDepth How many items from the stack trace to include in
      * the error response.
-     *
      * @return The error response to the given request message.
      */
     public static final Message createErrorResponse(Message request, Throwable error, int stackTraceDepth) {

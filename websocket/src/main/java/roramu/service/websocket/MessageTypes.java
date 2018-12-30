@@ -1,7 +1,7 @@
 package roramu.service.websocket;
 
-import roramu.util.reflection.TypeInfo;
 import roramu.service.status.ServiceStatus;
+import roramu.util.reflection.TypeInfo;
 
 /**
  * The different message types
@@ -18,7 +18,7 @@ public final class MessageTypes {
     }
 
     public static final class Response {
-        public static final MessageType<Object, Void> RESPONSE =  MessageType.create("RESPONSE", new TypeInfo<Object>() {}, TypeInfo.VOID);
+        public static final MessageType<Object, Void> RESPONSE = MessageType.create("RESPONSE", new TypeInfo<Object>() {}, TypeInfo.VOID);
         public static final MessageType<Object, Void> ERROR = MessageType.create("ERROR", new TypeInfo<Object>() {}, TypeInfo.VOID);
 
         private Response() {}

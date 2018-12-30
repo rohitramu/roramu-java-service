@@ -1,8 +1,8 @@
 package roramu.service.websocket.jetty;
 
 import org.eclipse.jetty.server.Server;
-import roramu.service.websocket.WebSocketService;
 import roramu.service.websocket.WebSocketServerLifecycleManager;
+import roramu.service.websocket.WebSocketService;
 
 import java.net.URI;
 

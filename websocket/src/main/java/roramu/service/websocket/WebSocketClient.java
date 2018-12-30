@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A WebSocket client.
- *
+ * <p>
  * Service implementations should extend this class to provide implementation-specific methods for interacting with the
  * service's APIs.
  */
@@ -70,7 +70,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param configurator The configurator implementation to be used in the
      * configuration. A configurator is most commonly used to intercept the
      * WebSocket handshake.
-     *
      * @return The configuration.
      */
     public static final ClientEndpointConfig getDefaultConfig(ClientEndpointConfig.Configurator configurator) {
@@ -101,7 +100,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      *
      * @param session The session in which the request was sent.
      * @param requestId The request ID.
-     *
      * @return The CallInfo object if it exists, otherwise null.
      */
     private static CallInfo getCallInfoForRequest(Session session, String requestId) {
@@ -118,7 +116,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      *
      * @param requestId The request ID of the request.
      * @param callInfo The CallInfo.
-     *
      * @return True if the request is now associated with the given CallInfo,
      * otherwise false (if a CallInfo already existed for this request).
      */
@@ -159,7 +156,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * Unregisters a message's request ID.
      *
      * @param requestId The message's request ID.
-     *
      * @return The old CallInfo object which was used to track the request.
      */
     private static CallInfo stopTrackingRequest(Session session, String requestId) {
@@ -174,9 +170,9 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     /**
      * Creates a WebSocket instance to manage an existing open session.
      * <p>
-     *     NOTE: The session will remain open indefinitely until either the
-     *     connection times out, the session is replaced with another session,
-     *     or {@link #close()} is called.
+     * NOTE: The session will remain open indefinitely until either the
+     * connection times out, the session is replaced with another session,
+     * or {@link #close()} is called.
      * </p>
      *
      * @param session The session.
@@ -211,7 +207,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * Closes the session which is used by this WebSocketClient instance.
      *
      * @param closeReason The close reason which will be given to the server.
-     *
      * @throws IllegalStateException If this client is not currently managing a
      * session. Set the session using {@link #setSession(Session)}.
      * @throws UncheckedIOException If there was an error while closing the
@@ -310,7 +305,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param requestId The request ID of the request.
      * @param responseConverter The JsonConverter to use when deserializing the
      * response.
-     *
      * @return The response to the request, which is extracted from the response
      * message.
      */
@@ -330,7 +324,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param timeout How long to wait before giving up on the call and throwing
      * an exception. Set this to zero to disable the timeout.
      * @param timeoutUnits The units for the timeout.
-     *
      * @return The response to the request, which is extracted from the response
      * message.
      */
@@ -385,9 +378,9 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     /**
      * Sends a message synchronously.
      * <p>
-     *     It is not recommended to use this overload unless the appropriate
-     *     {@link MessageType} is not available. Instead, use the
-     *     {@link #sendMessage(MessageType, Object)} method when possible.
+     * It is not recommended to use this overload unless the appropriate
+     * {@link MessageType} is not available. Instead, use the
+     * {@link #sendMessage(MessageType, Object)} method when possible.
      * </p>
      *
      * @param messageType The message type.
@@ -408,7 +401,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param <Req> The request type.
      * @param <Res> The response type.
      * @param messageType The message type.
-     *
      * @return The response.
      */
     protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType) {
@@ -424,7 +416,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param <Res> The response type.
      * @param messageType The message type.
      * @param messageBody The message body.
-     *
      * @return The response.
      */
     protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, Req messageBody) {
@@ -440,7 +431,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param timeout How long to wait before giving up on the call and throwing
      * an exception. Set this to zero to disable the timeout.
      * @param timeoutUnits The units for the timeout.
-     *
      * @return The response.
      */
     protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, long timeout, TimeUnit timeoutUnits) {
@@ -457,7 +447,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param timeout How long to wait before giving up on the call and throwing
      * an exception. Set this to zero to disable the timeout.
      * @param timeoutUnits The units for the timeout.
-     *
      * @return The response.
      */
     protected final <Req, Res> CompletableFuture<Response<Res>> sendRequestAsync(MessageType<Req, Res> messageType, Req messageBody, long timeout, TimeUnit timeoutUnits) {
@@ -470,16 +459,15 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * {@link #sendRequestAsync(String, JsonConverter, long, TimeUnit)}
      * method to set a timeout.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the appropriate
-     *     {@link MessageType} is not available. Use the
-     *     {@link #sendRequestAsync(MessageType, Object)} method when possible.
+     * NOTE: It is not recommended to use this overload unless the appropriate
+     * {@link MessageType} is not available. Use the
+     * {@link #sendRequestAsync(MessageType, Object)} method when possible.
      * </p>
      *
      * @param <Res> The response type.
      * @param messageType The message type.
      * @param responseConverter The JsonConverter to use when deserializing the
      * response.
-     *
      * @return The deserialized response.
      */
     protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, JsonConverter<Res> responseConverter) {
@@ -491,9 +479,9 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * {@link #sendRequestAsync(String, RawJsonString, JsonConverter, long, TimeUnit)}
      * method to set a timeout.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the appropriate
-     *     {@link MessageType} is not available. Use the
-     *     {@link #sendRequestAsync(MessageType, Object)} method when possible.
+     * NOTE: It is not recommended to use this overload unless the appropriate
+     * {@link MessageType} is not available. Use the
+     * {@link #sendRequestAsync(MessageType, Object)} method when possible.
      * </p>
      *
      * @param <Res> The response type.
@@ -501,7 +489,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param requestBody The JSON message body.
      * @param responseConverter The JsonConverter to use when deserializing the
      * response.
-     *
      * @return The deserialized response.
      */
     protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter) {
@@ -511,9 +498,9 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     /**
      * Sends a message asynchronously without a message body.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the
-     *     appropriate {@link MessageType} is not available. Use the
-     *     {@link #sendRequestAsync(MessageType)} method when possible.
+     * NOTE: It is not recommended to use this overload unless the
+     * appropriate {@link MessageType} is not available. Use the
+     * {@link #sendRequestAsync(MessageType)} method when possible.
      * </p>
      *
      * @param <Res> The response type.
@@ -523,7 +510,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param timeout How long to wait before giving up on the call and throwing
      * an exception. Set this to zero to disable the timeout.
      * @param timeoutUnits The units for the timeout.
-     *
      * @return The deserialized response.
      */
     protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
@@ -533,9 +519,9 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     /**
      * Sends a message asynchronously.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the
-     *     appropriate {@link MessageType} is not available. Use the
-     *     {@link #sendRequestAsync(MessageType, Object)} method when possible.
+     * NOTE: It is not recommended to use this overload unless the
+     * appropriate {@link MessageType} is not available. Use the
+     * {@link #sendRequestAsync(MessageType, Object)} method when possible.
      * </p>
      *
      * @param <Res> The response type.
@@ -546,7 +532,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param timeout How long to wait before giving up on the call and throwing
      * an exception. Set this to zero to disable the timeout.
      * @param timeoutUnits The units for the timeout.
-     *
      * @return The deserialized response.
      */
     protected final <Res> CompletableFuture<Response<Res>> sendRequestAsync(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
@@ -577,7 +562,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param <Req> The request type.
      * @param <Res> The response type.
      * @param messageType The message type.
-     *
      * @return The response.
      */
     protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType) {
@@ -594,7 +578,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param <Res> The response type.
      * @param messageType The message type.
      * @param requestBody The message body.
-     *
      * @return The response.
      */
     protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, Req requestBody) {
@@ -608,16 +591,15 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * Use the {@link #sendRequest(String, JsonConverter, long, TimeUnit)}
      * method to set a timeout.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the
-     *     appropriate {@link MessageType} is not available. Use the
-     *     {@link #sendRequest(MessageType)} method when possible.
+     * NOTE: It is not recommended to use this overload unless the
+     * appropriate {@link MessageType} is not available. Use the
+     * {@link #sendRequest(MessageType)} method when possible.
      * </p>
      *
      * @param <Res> The response type.
      * @param messageType The message type.
      * @param responseConverter The JsonConverter to use when deserializing the
      * response.
-     *
      * @return The response.
      */
     protected final <Res> Response<Res> sendRequest(String messageType, JsonConverter<Res> responseConverter) {
@@ -630,9 +612,9 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * {@link #sendRequest(String, RawJsonString, JsonConverter, long, TimeUnit)}
      * method to set a timeout.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the
-     *     appropriate {@link MessageType} is not available. Use the
-     *     {@link #sendRequest(MessageType, Object)} method when possible.
+     * NOTE: It is not recommended to use this overload unless the
+     * appropriate {@link MessageType} is not available. Use the
+     * {@link #sendRequest(MessageType, Object)} method when possible.
      * </p>
      *
      * @param <Res> The response type.
@@ -640,7 +622,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param requestBody The JSON message body.
      * @param responseConverter The JsonConverter to use when deserializing the
      * response.
-     *
      * @return The response.
      */
     protected final <Res> Response<Res> sendRequest(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter) {
@@ -648,7 +629,8 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
             messageType,
             requestBody,
             responseConverter,
-            0, null);
+            0, null
+        );
     }
 
     /**
@@ -660,7 +642,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param messageType The message type.
      * @param timeout The timeout.
      * @param timeoutUnits The timeout units.
-     *
      * @return The response.
      */
     protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, long timeout, TimeUnit timeoutUnits) {
@@ -677,7 +658,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * @param requestBody The message body.
      * @param timeout The timeout.
      * @param timeoutUnits The timeout units.
-     *
      * @return The response.
      */
     protected final <Req, Res> Response<Res> sendRequest(MessageType<Req, Res> messageType, Req requestBody, long timeout, TimeUnit timeoutUnits) {
@@ -689,10 +669,10 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * Sends a request without a message body and waits for the response,
      * using the specified timeout period for awaiting the response.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the
-     *     appropriate {@link MessageType} is not available. Instead, use the
-     *     {@link #sendRequest(MessageType, long, TimeUnit)}
-     *     method when possible.
+     * NOTE: It is not recommended to use this overload unless the
+     * appropriate {@link MessageType} is not available. Instead, use the
+     * {@link #sendRequest(MessageType, long, TimeUnit)}
+     * method when possible.
      * </p>
      *
      * @param <Res> The response type.
@@ -701,7 +681,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * response.
      * @param timeout The timeout.
      * @param timeoutUnits The timeout units.
-     *
      * @return The response.
      */
     protected final <Res> Response<Res> sendRequest(String messageType, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {
@@ -712,10 +691,10 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * Sends a request and waits for the response, using the specified timeout
      * period for awaiting the response.
      * <p>
-     *     NOTE: It is not recommended to use this overload unless the
-     *     appropriate {@link MessageType} is not available. Instead, use the
-     *     {@link #sendRequest(MessageType, Object, long, TimeUnit)}
-     *     method when possible.
+     * NOTE: It is not recommended to use this overload unless the
+     * appropriate {@link MessageType} is not available. Instead, use the
+     * {@link #sendRequest(MessageType, Object, long, TimeUnit)}
+     * method when possible.
      * </p>
      *
      * @param <Res> The response type.
@@ -725,7 +704,6 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * response.
      * @param timeout The timeout.
      * @param timeoutUnits The timeout units.
-     *
      * @return The response.
      */
     protected final <Res> Response<Res> sendRequest(String messageType, RawJsonString requestBody, JsonConverter<Res> responseConverter, long timeout, TimeUnit timeoutUnits) {

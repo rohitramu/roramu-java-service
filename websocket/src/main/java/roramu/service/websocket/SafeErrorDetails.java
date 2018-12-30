@@ -137,7 +137,7 @@ public final class SafeErrorDetails {
      * provided stack trace.
      */
     public SafeErrorDetails(String error, String reason, StackTraceElement[] stackTrace, int maxStackTraceDepth) {
-        this(error, new String[] { reason }, stackTrace, maxStackTraceDepth);
+        this(error, new String[]{reason}, stackTrace, maxStackTraceDepth);
     }
 
     /**
@@ -169,7 +169,7 @@ public final class SafeErrorDetails {
             strings.add(currentReason.toString());
             currentReason = currentReason.getCause();
         }
-        String[] reasonMessages = strings.toArray(new String[] {});
+        String[] reasonMessages = strings.toArray(new String[]{});
         return reasonMessages;
     }
 

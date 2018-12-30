@@ -9,7 +9,13 @@ import roramu.service.websocket.WebSocketHandshakeFilter;
 import roramu.service.websocket.WebSocketService;
 import roramu.util.net.NetworkUtils;
 
-import javax.servlet.*;
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.ServerContainer;
@@ -26,51 +32,28 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
     private static final String LOCALHOST_IP = "127.0.0.1";
 
     public Server start(String route, int port, Class<T> implementation) {
-        if (route == null) {
-            throw new IllegalArgumentException("'route' cannot be null");
-        }
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
         return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route));
     }
 
     public Server start(String route, int port, Class<T> implementation, WebSocketHandshakeFilter handshakeFilter) {
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
         return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route), handshakeFilter);
     }
 
     public Server start(String route, int port, Class<T> implementation, ServerEndpointConfig.Configurator configurator) {
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
         return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route, configurator), null);
     }
 
     public Server start(String route, int port, ServerEndpointConfig config) {
-        if (route == null) {
-            throw new IllegalArgumentException("'route' cannot be null");
-        }
-        if (config == null) {
-            throw new IllegalArgumentException("'config' cannot be null");
-        }
         return this.start(route, port, config, null);
     }
 
     public Server start(Class<T> implementation, String route, int port, ServerEndpointConfig.Configurator configurator, WebSocketHandshakeFilter handshakeFilter) {
-        if (route == null) {
-            throw new IllegalArgumentException("'route' cannot be null");
-        }
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
         return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route, configurator), handshakeFilter);
     }
 
     /**
      * Starts a {@link WebSocketService} and returns the {@link Server} instance.
+     *
      * @param route The route that the service will be exposed on.
      * @param port The port that the server should listen on.  If this is null, a randomly allocated ephemeral port is used.
      * @param config The server's config.
@@ -91,12 +74,12 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
         }
 
         // TODO: Find a better way to select these values
-//        int corePoolSize = Runtime.getRuntime().availableProcessors();
-//        int maxPoolSize = corePoolSize * 10;
-//        int threadKeepAliveTime = 5000;
-//        int queueLength = maxPoolSize * 2;
-//        ThreadPool serverThreadPool = new QueuedThreadPool(maxPoolSize, corePoolSize, threadKeepAliveTime, new LinkedBlockingQueue<>(queueLength));
-//        Server server = new Server(serverThreadPool);
+        //        int corePoolSize = Runtime.getRuntime().availableProcessors();
+        //        int maxPoolSize = corePoolSize * 10;
+        //        int threadKeepAliveTime = 5000;
+        //        int queueLength = maxPoolSize * 2;
+        //        ThreadPool serverThreadPool = new QueuedThreadPool(maxPoolSize, corePoolSize, threadKeepAliveTime, new LinkedBlockingQueue<>(queueLength));
+        //        Server server = new Server(serverThreadPool);
         Server server = new Server();
 
         // Set up a connector to always use the localhost address
