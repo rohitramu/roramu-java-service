@@ -8,13 +8,17 @@ import java.net.URI;
 
 public class JettyWebSocketServerLifecycleManager<T extends WebSocketService> implements WebSocketServerLifecycleManager {
     public static final String DEFAULT_ROUTE = "/";
-    public static final int DEFAULT_PORT = 80;
+    public static final int DEFAULT_PORT = 0; // pick any available ephemeral port by default
 
     private final String route;
     private final int port;
     private final Class<T> serviceImplementation;
 
     private Server server = null;
+
+    public JettyWebSocketServerLifecycleManager(Class<T> serviceImplementation) {
+        this(serviceImplementation, DEFAULT_ROUTE, DEFAULT_PORT);
+    }
 
     public JettyWebSocketServerLifecycleManager(Class<T> serviceImplementation, String route) {
         this(serviceImplementation, route, DEFAULT_PORT);
