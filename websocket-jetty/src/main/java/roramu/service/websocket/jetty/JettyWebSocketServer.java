@@ -62,10 +62,10 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
      */
     public Server start(String route, Integer port, ServerEndpointConfig config, WebSocketHandshakeFilter handshakeFilter) {
         if (route == null) {
-            throw new IllegalArgumentException("'route' cannot be null");
+            throw new NullPointerException("'route' cannot be null");
         }
         if (config == null) {
-            throw new IllegalArgumentException("'config' cannot be null");
+            throw new NullPointerException("'config' cannot be null");
         }
         if (port == null) {
             port = 0;

@@ -26,7 +26,7 @@ public class JettyWebSocketServerLifecycleManager<T extends WebSocketService> im
 
     public JettyWebSocketServerLifecycleManager(Class<T> serviceImplementation, String route, int port) {
         if (serviceImplementation == null) {
-            throw new IllegalArgumentException("'serviceImplementation' cannot be null");
+            throw new NullPointerException("'serviceImplementation' cannot be null");
         }
 
         this.serviceImplementation = serviceImplementation;
