@@ -1,5 +1,5 @@
 dependencies {
-    api project(':websocket')
+    api project(':websocket-server')
 
     // roramu.util
     implementation 'roramu.util:net:[0.0,)'
@@ -14,6 +14,5 @@ dependencies {
 
     // Jetty
     api 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.4.7.v20170914'
-    api 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.4.7.v20170914'
     implementation 'org.slf4j:slf4j-nop:1.7.25' // some version of slf4j is required for logging in Jetty
 }

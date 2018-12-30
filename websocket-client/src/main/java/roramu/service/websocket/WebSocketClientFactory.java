@@ -1,6 +1,4 @@
-package roramu.service.websocket.jetty;
-
-import roramu.service.websocket.WebSocketClient;
+package roramu.service.websocket;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -12,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.function.Supplier;
 
-public final class JettyWebSocketClientFactory {
+public final class WebSocketClientFactory {
     /**
      * Creates a new connection given a client implementation and the server URI.  The default constructor will be used
      * to construct an instance of this client implementation.  Do not use this overload if the client implementation

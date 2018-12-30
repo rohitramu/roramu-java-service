@@ -1,0 +1,8 @@
+dependencies {
+    api project(':websocket')
+    implementation project(':status')
+
+    implementation 'roramu.util:async:+'
+    implementation 'roramu.util:exception:+'
+    implementation 'roramu.util:reflection:+'
+}
