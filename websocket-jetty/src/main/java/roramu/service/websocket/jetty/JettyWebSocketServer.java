@@ -124,7 +124,7 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
 
             server.start();
 
-            System.out.println("Started Jetty WebSocket server at '" + server.getURI().toString() + "' using service implementation '" + config.getEndpointClass().getName() + "'");
+            System.out.println("Started Jetty WebSocket server at '" + server.getURI().toString() + "' using service implementation '" + config.getEndpointClass().getCanonicalName() + "'");
         } catch (Throwable thr) {
             // TODO: log
             throw new RuntimeException(thr);

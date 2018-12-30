@@ -115,13 +115,13 @@ public final class JettyWebSocketClientFactory {
             try {
                 webSocketClient = implementation.getConstructor().newInstance();
             } catch (NoSuchMethodException ex) {
-                throw new IllegalArgumentException("The class '" + implementation.getTypeName() + "' does not have a default constructor - please provide the implementationFactory argument", ex);
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' does not have a default constructor - please provide the implementationFactory argument", ex);
             } catch (InstantiationException ex) {
-                throw new IllegalArgumentException("The class '" + implementation.getTypeName() + "' is abstract, and cannot be instantiated with the default constructor", ex);
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' is abstract, and cannot be instantiated with the default constructor", ex);
             } catch (IllegalAccessException ex) {
-                throw new IllegalArgumentException("The class '" + implementation.getTypeName() + "' has a default constructor which cannot by accessed", ex);
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' has a default constructor which cannot by accessed", ex);
             } catch (InvocationTargetException ex) {
-                throw new IllegalArgumentException("The class '" + implementation.getTypeName() + "' threw an exception when the default constructor was invoked", ex);
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' threw an exception when the default constructor was invoked", ex);
             }
         }
 
