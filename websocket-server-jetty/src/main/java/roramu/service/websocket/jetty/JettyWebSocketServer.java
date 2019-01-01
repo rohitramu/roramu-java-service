@@ -29,7 +29,7 @@ import java.util.EnumSet;
  * @param <T> The type which implements a {@link WebSocketService}.
  */
 public final class JettyWebSocketServer<T extends WebSocketService> {
-    private static final String LOCALHOST_IP = "127.0.0.1";
+    private static final String LOCALHOST_IP = "0.0.0.0";
 
     public Server start(String route, int port, Class<T> implementation) {
         return this.start(route, port, WebSocketService.getDefaultConfig(implementation, route));
