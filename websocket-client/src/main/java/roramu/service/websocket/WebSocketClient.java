@@ -141,7 +141,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
         }
 
         // Create the CallInfo object which will track the response
-        String requestId = message.getRequestId();
+        String requestId = message.getId();
         CallInfo callInfo = new CallInfo(message);
 
         // Register the CallInfo object so the message listener thread can notify this thread that a response has arrived
@@ -271,7 +271,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      */
     @Override
     protected final void handleResponse(Session session, Message response) {
-        String requestId = response.getRequestId();
+        String requestId = response.getId();
         CallInfo callInfo = getCallInfoForRequest(session, requestId);
         if (callInfo != null) {
             // We were waiting for this response, so handle it
@@ -281,7 +281,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
 
             String message =
                 "[" + requestId + "] "
-                    + StringUtils.padRight(30, callInfo.request.getMessageType())
+                    + StringUtils.padRight(30, callInfo.request.getOp())
                     + StringUtils.padRight(30, "Roundtrip time = " + roundtripTime + " ms")
                     + StringUtils.padRight(30, "Processing time = " + processingTime + " ms")
                     + "Network latency = " + (roundtripTime - processingTime) + " ms";
@@ -292,7 +292,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
             // Ignore the message if we weren't waiting on this response
 
             // TODO: log
-            System.out.println("Ignored response with ID: " + response.getRequestId());
+            System.out.println("Ignored response with ID: " + response.getId());
         }
     }
 
@@ -730,7 +730,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
         WebSocketEndpoint.sendMessage(this.session, message);
 
         // Wait for the response
-        String requestId = message.getRequestId();
+        String requestId = message.getId();
         Response<Res> response;
         if (timeout == 0) {
             response = awaitMessageResponse(requestId, responseConverter);
@@ -814,7 +814,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
                 }
 
                 if (!receivedResult && timedOut) {
-                    throw new TimeoutException("Call with request ID '" + this.request.getRequestId() + "' timed out before receiving a response");
+                    throw new TimeoutException("Call with request ID '" + this.request.getId() + "' timed out before receiving a response");
                 }
 
                 return this.result;

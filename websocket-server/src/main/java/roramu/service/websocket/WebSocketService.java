@@ -53,7 +53,7 @@ public abstract class WebSocketService extends WebSocketEndpoint {
             // Safely process status - we don't want an error in service code to fail the status response
             Object processedStatus;
             try {
-                processedStatus = processStatusRequest(request);
+                processedStatus = addExtraStatusInfo(request);
             } catch (RuntimeException ex) {
                 processedStatus = new SafeErrorDetails("Failed to process status", ex, ex.getStackTrace(), true);
             }
@@ -144,12 +144,12 @@ public abstract class WebSocketService extends WebSocketEndpoint {
 
     /**
      * Provides extra information about the status of the endpoint given some
-     * request data.
+     * data from the message body of the request.
      *
-     * @param requestData The request data.
+     * @param statusRequestBody The data from the status request message body.
      * @return The extra status information.
      */
-    public Object processStatusRequest(Object requestData) {
+    public Object addExtraStatusInfo(Object statusRequestBody) {
         // Basic JVM status will always be provided, so this method is not abstract since it shouldn't be mandatory to implement
         return null;
     }

@@ -7,12 +7,10 @@ import java.util.UUID;
 
 /**
  * Represents a message which can be sent between services.
- * <p>
- * TODO: javadoc comments for property getters and setters
  */
 public final class Message {
-    private String requestId;
-    private String messageType;
+    private String id;
+    private String op;
     private RawJsonString body;
     private Long sentMillis;
     private Long receivedMillis;
@@ -29,15 +27,15 @@ public final class Message {
     /**
      * Creates a message that can be sent between services.
      *
-     * @param requestId The request ID to be used for synchronous calls. If
+     * @param id The request ID to be used for synchronous calls. If
      * this is null, this message should be sent asynchronously without waiting
      * for a response.
-     * @param messageType The type of message being sent.
+     * @param op The type of message being sent (i.e. the operation type).
      * @param jsonBody The JSON message body.
      */
-    private Message(String requestId, String messageType, RawJsonString jsonBody) {
-        this.requestId = requestId;
-        this.messageType = messageType;
+    private Message(String id, String op, RawJsonString jsonBody) {
+        this.id = id;
+        this.op = op;
         this.body = jsonBody;
     }
 
@@ -84,7 +82,7 @@ public final class Message {
             throw new IllegalArgumentException("The request message is not expecting a response.");
         }
 
-        Message responseMessage = new Message(request.getRequestId(), MessageTypes.Response.RESPONSE.getName(), jsonResponse);
+        Message responseMessage = new Message(request.getId(), MessageTypes.Response.RESPONSE.getName(), jsonResponse);
         responseMessage.setSentMillis(request.getSentMillis());
 
         return responseMessage;
@@ -126,7 +124,7 @@ public final class Message {
         String requestId = null;
         Long sentMillis = null;
         if (request != null) {
-            requestId = request.getRequestId();
+            requestId = request.getId();
             sentMillis = request.getSentMillis();
         }
 
@@ -146,59 +144,115 @@ public final class Message {
         return response;
     }
 
-    public final String getRequestId() {
-        return requestId;
+    /**
+     * Gets the message ID.
+     * @return The message ID.
+     */
+    public final String getId() {
+        return id;
     }
 
-    private void setRequestId(String requestId) {
-        this.requestId = requestId;
+    /**
+     * Sets the message ID.
+     * @param id The message ID.
+     */
+    private void setId(String id) {
+        this.id = id;
     }
 
-    public final String getMessageType() {
-        return messageType;
+    /**
+     * Gets the message type (i.e. operation type).
+     * @return The message type (i.e. operation type).
+     */
+    public final String getOp() {
+        return op;
     }
 
-    private void setMessageType(String messageType) {
-        this.messageType = messageType;
+    /**
+     * Sets the message type (i.e. operation type).
+     * @param op The message type (i.e. operation type).
+     */
+    private void setOp(String op) {
+        this.op = op;
     }
 
+    /**
+     * Gets the message body.
+     * @return The message body.
+     */
     public final RawJsonString getBody() {
         return this.body;
     }
 
+    /**
+     * Sets the message body.
+     * @param body The message body.
+     */
     private void setBody(Object body) {
         // It's ok to use JsonUtils directly here since it will not be exposed
         this.body = new RawJsonString(JsonUtils.write(body));
     }
 
+    /**
+     * Gets the Unix epoch time of when the message was sent.
+     * @return The Unix epoch time of when the message was sent.
+     */
     public final Long getSentMillis() {
         return this.sentMillis;
     }
 
+    /**
+     * Sets the Unix epoch time of when the message was sent.
+     * @param sentMillis The Unix epoch time of when the message was sent.
+     */
     protected final void setSentMillis(Long sentMillis) {
         this.sentMillis = sentMillis;
     }
 
+    /**
+     * Gets the Unix epoch time of when the message was received.
+     * @return The Unix epoch time of when the message was received.
+     */
     public final Long getReceivedMillis() {
         return this.receivedMillis;
     }
 
+    /**
+     * Sets the Unix epoch time of when the message was received.
+     * @param receivedMillis The Unix epoch time of when the message was received.
+     */
     protected final void setReceivedMillis(Long receivedMillis) {
         this.receivedMillis = receivedMillis;
     }
 
+    /**
+     * Gets the Unix epoch time of when the message started to be processed.
+     * @return The Unix epoch time of when the message started to be processed.
+     */
     public final Long getStartProcessingMillis() {
         return startProcessingMillis;
     }
 
+    /**
+     * Sets the Unix epoch time of when the message started to be processed.
+     * @param startProcessingMillis The Unix epoch time of when the message started to be processed.
+     */
     public final void setStartProcessingMillis(Long startProcessingMillis) {
         this.startProcessingMillis = startProcessingMillis;
     }
 
+    /**
+     * Gets the Unix epoch time of when the message finished being processed.
+     * @return The Unix epoch time of when the message finished being processed.
+     */
     public final Long getStopProcessingMillis() {
         return stopProcessingMillis;
     }
 
+    /**
+     * Sets the Unix epoch time of when the message finished being processed.
+     * @param stopProcessingMillis The Unix epoch time of when the message finished being processed.
+     */
     public final void setStopProcessingMillis(Long stopProcessingMillis) {
         this.stopProcessingMillis = stopProcessingMillis;
     }
@@ -209,7 +263,7 @@ public final class Message {
      * @return True if this message is a response, otherwise false.
      */
     public final boolean isResponse() {
-        return this.requestId != null && MessageTypes.isResponse(this.messageType);
+        return this.id != null && MessageTypes.isResponse(this.op);
     }
 
     /**
@@ -218,7 +272,7 @@ public final class Message {
      * @return True if the message represents an error, otherwise false.
      */
     public final boolean isError() {
-        return MessageTypes.isError(this.messageType);
+        return MessageTypes.isError(this.op);
     }
 
     /**
@@ -228,6 +282,6 @@ public final class Message {
      * @return True if the message requires a response, otherwise false.
      */
     public final boolean isExpectingResponse() {
-        return this.requestId != null && !this.isResponse();
+        return this.id != null && !this.isResponse();
     }
 }

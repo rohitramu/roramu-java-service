@@ -64,7 +64,7 @@ public abstract class WebSocketEndpoint extends Endpoint {
     public final Map<String, MessageHandler> getMessageHandlers() {
         Map<String, MessageHandler> messageHandlers = this.createMessageHandlers();
         if (messageHandlers == null) {
-            throw new NullPointerException("The 'createMessageHandlers()' method returned null. Did you mean for it to return an empty map?");
+            throw new NullPointerException("The 'createMessageHandlers()' method returned null. Did you mean for it to return an empty map instead?");
         }
 
         return Collections.unmodifiableMap(messageHandlers);
@@ -135,10 +135,10 @@ public abstract class WebSocketEndpoint extends Endpoint {
         try {
             message = JsonUtils.read(stringMessage, new TypeInfo<Message>() {});
 
-            if (message.getMessageType() == null) {
+            if (message.getOp() == null) {
                 throw new NullPointerException("Message type is null");
             }
-            String messageType = message.getMessageType().toUpperCase();
+            String messageType = message.getOp().toUpperCase();
             message.setReceivedMillis(TimeUtils.getCurrentMillis());
 
             if (message.isResponse()) {
@@ -146,7 +146,7 @@ public abstract class WebSocketEndpoint extends Endpoint {
             } else {
                 // Make sure a handler exists for this message type
                 if (!this.getMessageHandlers().containsKey(messageType)) {
-                    throw new IllegalArgumentException("Unknown message type '" + message.getMessageType() + "'");
+                    throw new IllegalArgumentException("Unknown message type '" + message.getOp() + "'");
                 }
 
                 // Process the message
