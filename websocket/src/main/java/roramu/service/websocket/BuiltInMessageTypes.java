@@ -4,13 +4,13 @@ import roramu.service.status.ServiceStatus;
 import roramu.util.reflection.TypeInfo;
 
 /**
- * The different message types
+ * The built-in message types
  */
-public final class MessageTypes {
-    private MessageTypes() {}
+public final class BuiltInMessageTypes {
+    private BuiltInMessageTypes() {}
 
     public static final boolean isResponse(String messageType) {
-        return Response.RESPONSE.getName().equals(messageType) || MessageTypes.isError(messageType);
+        return Response.RESPONSE.getName().equals(messageType) || BuiltInMessageTypes.isError(messageType);
     }
 
     public static final boolean isError(String messageType) {

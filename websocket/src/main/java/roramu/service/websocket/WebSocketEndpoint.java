@@ -33,7 +33,6 @@ import java.util.concurrent.ExecutionException;
  * NOTE: Every subclass that defines a constructor MUST ALSO define a
  * default constructor. This allows instances of this class to be created
  * during deployment. The default constructor may be private.
- * </p>
  */
 public abstract class WebSocketEndpoint extends Endpoint {
     /**

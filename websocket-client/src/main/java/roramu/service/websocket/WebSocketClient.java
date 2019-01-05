@@ -46,7 +46,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      */
     @SuppressWarnings("FieldCanBeLocal")
     private final MessageHandler errorHandler = TypedMessageHandler.create(
-        MessageTypes.Response.ERROR,
+        BuiltInMessageTypes.Response.ERROR,
         (request) -> {
             System.err.println("ERROR:\n" + JsonUtils.write(request));
             return null;
@@ -238,7 +238,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
         Map<String, MessageHandler> handlers = super.createMessageHandlers();
 
         // Add the "ERROR" message handler
-        handlers.putIfAbsent(MessageTypes.Response.ERROR.getName(), errorHandler);
+        handlers.putIfAbsent(BuiltInMessageTypes.Response.ERROR.getName(), errorHandler);
 
         return handlers;
     }

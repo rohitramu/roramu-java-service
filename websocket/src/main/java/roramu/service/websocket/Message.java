@@ -49,10 +49,10 @@ public final class Message {
      * @return The new message.
      */
     public static final Message create(boolean isExpectingResponse, String messageType, RawJsonString jsonBody) {
-        if (MessageTypes.isError(messageType)) {
+        if (BuiltInMessageTypes.isError(messageType)) {
             throw new IllegalArgumentException("Use the 'createErrorResponse' method when creating an error response");
         }
-        if (MessageTypes.isResponse(messageType)) {
+        if (BuiltInMessageTypes.isResponse(messageType)) {
             throw new IllegalArgumentException("Use the 'createResponse' method when creating a successfulResponse");
         }
 
@@ -82,7 +82,7 @@ public final class Message {
             throw new IllegalArgumentException("The request message is not expecting a response.");
         }
 
-        Message responseMessage = new Message(request.getId(), MessageTypes.Response.RESPONSE.getName(), jsonResponse);
+        Message responseMessage = new Message(request.getId(), BuiltInMessageTypes.Response.RESPONSE.getName(), jsonResponse);
         responseMessage.setSentMillis(request.getSentMillis());
 
         return responseMessage;
@@ -129,7 +129,7 @@ public final class Message {
         }
 
         // Serialize the error
-        String messageType = MessageTypes.Response.ERROR.getName();
+        String messageType = BuiltInMessageTypes.Response.ERROR.getName();
         Throwable cause = error.getCause();
         String causeMessage = null;
         if (cause != null) {
@@ -263,7 +263,7 @@ public final class Message {
      * @return True if this message is a response, otherwise false.
      */
     public final boolean isResponse() {
-        return this.id != null && MessageTypes.isResponse(this.op);
+        return this.id != null && BuiltInMessageTypes.isResponse(this.op);
     }
 
     /**
@@ -272,7 +272,7 @@ public final class Message {
      * @return True if the message represents an error, otherwise false.
      */
     public final boolean isError() {
-        return MessageTypes.isError(this.op);
+        return BuiltInMessageTypes.isError(this.op);
     }
 
     /**

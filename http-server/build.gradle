@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':status')
+
+    // roramu.util
+    implementation 'roramu.util:json:+'
+
+    // Servlets
+    api 'javax.servlet:javax.servlet-api:4.0.0'
+}

@@ -22,13 +22,6 @@ public final class WebSocketClientFactory {
      * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
      */
     public static <T extends WebSocketClient> T connect(Class<T> implementation, URI path) {
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
-        if (path == null) {
-            throw new NullPointerException("'path' cannot be null");
-        }
-
         return connect(implementation, path, null);
     }
 
@@ -44,13 +37,6 @@ public final class WebSocketClientFactory {
      * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
      */
     public static <T extends WebSocketClient> T connect(Class<T> implementation, URI path, Supplier<T> implementationFactory) {
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
-        if (path == null) {
-            throw new NullPointerException("'path' cannot be null");
-        }
-
         return connect(implementation, path, implementationFactory, WebSocketClient.getDefaultConfig());
     }
 
@@ -67,12 +53,6 @@ public final class WebSocketClientFactory {
      * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
      */
     public static <T extends WebSocketClient> T connect(Class<T> implementation, URI path, Supplier<T> implementationFactory, ClientEndpointConfig.Configurator configurator) {
-        if (implementation == null) {
-            throw new NullPointerException("'implementation' cannot be null");
-        }
-        if (path == null) {
-            throw new NullPointerException("'path' cannot be null");
-        }
         if (configurator == null) {
             throw new NullPointerException("'configurator' cannot be null");
         }

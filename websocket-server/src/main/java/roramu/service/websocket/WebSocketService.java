@@ -48,7 +48,7 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      */
     @SuppressWarnings("FieldCanBeLocal")
     private final MessageHandler statusHandler = TypedMessageHandler.create(
-        MessageTypes.System.STATUS,
+        BuiltInMessageTypes.System.STATUS,
         request -> {
             // Safely process status - we don't want an error in service code to fail the status response
             Object processedStatus;
@@ -67,7 +67,7 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * Handler for closing all sessions.
      */
     private final MessageHandler closeSessionsHandler = TypedMessageHandler.create(
-        MessageTypes.System.CLOSE_ALL_SESSIONS,
+        BuiltInMessageTypes.System.CLOSE_ALL_SESSIONS,
         request -> {
             CloseReason closeReason = new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "Service is being undeployed");
             closeAllSessions(closeReason);
@@ -80,8 +80,7 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * service.
      *
      * @param impl The implementing service.
-     * @param path The path of the service (must start with a '{@code /}'
-     * character).
+     * @param path The path of the service (must start with a '{@code /}' character).
      * @return The configuration.
      */
     public static final ServerEndpointConfig getDefaultConfig(Class<? extends WebSocketService> impl, String path) {
@@ -93,8 +92,7 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * service.
      *
      * @param impl The implementing service.
-     * @param path The path of the service (must start with a '{@code /}'
-     * character).
+     * @param path The path of the service (must start with a '{@code /}' character).
      * @param configurator The configurator implementation to be used in the
      * configuration. A configurator is most commonly used to intercept the
      * WebSocket handshake.
@@ -114,9 +112,15 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * Gets the builder for a {@link ServerEndpointConfig} with the default
      * options set.
      *
+     * @param impl The implementing service.
+     * @param path The path of the service (must start with a '{@code /}' character).
      * @return The ServerEndpointConfig builder.
      */
     private static ServerEndpointConfig.Builder getConfigBuilder(Class<? extends WebSocketService> impl, String path) {
+        if (!path.startsWith("/")) {
+            throw new IllegalArgumentException("'path' must start with a '/' character");
+        }
+
         return ServerEndpointConfig.Builder
             .create(impl, path)
             .subprotocols(Collections.singletonList("json"));
@@ -134,10 +138,10 @@ public abstract class WebSocketService extends WebSocketEndpoint {
         Map<String, MessageHandler> handlers = super.createMessageHandlers();
 
         // Add the default "STATUS" message handler
-        handlers.put(MessageTypes.System.STATUS.getName(), statusHandler);
+        handlers.put(BuiltInMessageTypes.System.STATUS.getName(), statusHandler);
 
         // Add the default "CLOSE_ALL_SESSIONS" message handler
-        handlers.put(MessageTypes.System.CLOSE_ALL_SESSIONS.getName(), closeSessionsHandler);
+        handlers.put(BuiltInMessageTypes.System.CLOSE_ALL_SESSIONS.getName(), closeSessionsHandler);
 
         return handlers;
     }

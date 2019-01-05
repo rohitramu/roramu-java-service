@@ -1,15 +1,15 @@
 package roramu.service.status;
 
 /**
- * Represents the status of a service.
+ * Represents the extraInfo of a service.
  */
 public class ServiceStatus {
     private final JvmStatus jvmStatus;
-    private final Object status;
+    private final Object extraInfo;
 
     public ServiceStatus(JvmStatus jvmStatus, Object extraInfo) {
         this.jvmStatus = jvmStatus;
-        this.status = extraInfo;
+        this.extraInfo = extraInfo;
     }
 
     public ServiceStatus(Object extraInfo) {
@@ -24,7 +24,7 @@ public class ServiceStatus {
         return this.jvmStatus;
     }
 
-    public Object getStatus() {
-        return this.status;
+    public Object getExtraInfo() {
+        return this.extraInfo;
     }
 }
