@@ -4,4 +4,5 @@ dependencies {
 
     // For getting status 
     implementation 'com.kstruct:gethostname4j:0.0.2'
+//    implementation 'com.github.oshi:oshi-core:3.12.1'
 }
