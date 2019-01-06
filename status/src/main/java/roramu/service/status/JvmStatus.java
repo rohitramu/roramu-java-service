@@ -7,6 +7,7 @@ import roramu.util.time.TimeUtils;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.file.Paths;
@@ -15,7 +16,8 @@ import java.nio.file.Paths;
  * Represents the status of the Java Virtual Machine.
  */
 public class JvmStatus {
-    private static final OperatingSystemMXBean osXBean = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
+    private static final OperatingSystemMXBean osBean = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
+    private static final MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
 
     // General
     /**
@@ -116,9 +118,9 @@ public class JvmStatus {
         status.osArchitecture = null;
         status.osVersion = null;
         try {
-            status.osName = osXBean.getName();
-            status.osArchitecture = osXBean.getArch();
-            status.osVersion = osXBean.getVersion();
+            status.osName = osBean.getName();
+            status.osArchitecture = osBean.getArch();
+            status.osVersion = osBean.getVersion();
         } catch (Exception ex) {
             // TODO: log
             ex.printStackTrace();
@@ -126,8 +128,8 @@ public class JvmStatus {
 
         // Safely get CPU info
         try {
-            status.cpuCores = osXBean.getAvailableProcessors();
-            status.cpuLoad = osXBean.getSystemCpuLoad();
+            status.cpuCores = osBean.getAvailableProcessors();
+            status.cpuLoad = osBean.getSystemCpuLoad();
         } catch (Exception ex) {
             // TODO: log
             ex.printStackTrace();
@@ -135,11 +137,11 @@ public class JvmStatus {
 
         // Safely get memory info
         try {
-            Runtime runtime = Runtime.getRuntime();
-            status.physicalMemoryTotalBytes = osXBean.getTotalPhysicalMemorySize();
-            status.physicalMemoryFreeBytes = osXBean.getFreePhysicalMemorySize();
-            status.runtimeMemoryTotalBytes = runtime.totalMemory();
-            status.runtimeMemoryFreeBytes = runtime.freeMemory();
+            status.physicalMemoryTotalBytes = osBean.getTotalPhysicalMemorySize();
+            status.physicalMemoryFreeBytes = osBean.getFreePhysicalMemorySize();
+            status.runtimeMemoryTotalBytes = memoryBean.getNonHeapMemoryUsage().getCommitted() + memoryBean.getHeapMemoryUsage().getCommitted();
+            status.runtimeMemoryFreeBytes = status.runtimeMemoryTotalBytes -
+                (memoryBean.getNonHeapMemoryUsage().getUsed() + memoryBean.getHeapMemoryUsage().getUsed());
         } catch (Exception ex) {
             // TODO: log
             ex.printStackTrace();
