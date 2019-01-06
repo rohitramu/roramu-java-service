@@ -6,7 +6,6 @@ import roramu.util.net.NetworkUtils;
 import roramu.util.time.TimeUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -16,15 +15,7 @@ import java.nio.file.Paths;
  * Represents the status of the Java Virtual Machine.
  */
 public class JvmStatus {
-    private static final OperatingSystemMXBean osXBean;
-
-    static {
-        try {
-            osXBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-        } catch (IOException ex) {
-            throw new RuntimeException("Unable to initialize OperatingSystemMXBean.", ex);
-        }
-    }
+    private static final OperatingSystemMXBean osXBean = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
 
     // General
     /**
@@ -33,10 +24,6 @@ public class JvmStatus {
      * {@link TimeUtils#getCurrentMillis() } method.
      */
     private Long lastUpdated;
-    /**
-     * The host machine's name.
-     */
-    private String machineName;
 
     // OS
     /**
@@ -202,15 +189,6 @@ public class JvmStatus {
      */
     public long getLastUpdated() {
         return this.lastUpdated;
-    }
-
-    /**
-     * The host machine's name.
-     *
-     * @return The host machine's name.
-     */
-    public String getMachineName() {
-        return this.machineName;
     }
 
     /**
