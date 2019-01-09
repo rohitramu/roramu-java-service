@@ -1,7 +1,7 @@
 wrapper.gradleVersion = '5.0'
 
 // Major.Minor build version - this should be considered the release version number, and should be incremented manually when required
-def buildVersion = '1.0'
+def buildVersion = '1'
 
 def currentVersion = "${buildVersion}.${rootProject.buildRevision}"
 
