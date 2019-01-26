@@ -10,7 +10,7 @@ import java.util.UUID;
  */
 public final class Message {
     private String id;
-    private String op;
+    private String type;
     private RawJsonString body;
     private Long sentMillis;
     private Long receivedMillis;
@@ -30,12 +30,12 @@ public final class Message {
      * @param id The request ID to be used for synchronous calls. If
      * this is null, this message should be sent asynchronously without waiting
      * for a response.
-     * @param op The type of message being sent (i.e. the operation type).
+     * @param type The type of message being sent.
      * @param jsonBody The JSON message body.
      */
-    private Message(String id, String op, RawJsonString jsonBody) {
+    private Message(String id, String type, RawJsonString jsonBody) {
         this.id = id;
-        this.op = op;
+        this.type = type;
         this.body = jsonBody;
     }
 
@@ -164,16 +164,16 @@ public final class Message {
      * Gets the message type (i.e. operation type).
      * @return The message type (i.e. operation type).
      */
-    public final String getOp() {
-        return op;
+    public final String getType() {
+        return type;
     }
 
     /**
      * Sets the message type (i.e. operation type).
-     * @param op The message type (i.e. operation type).
+     * @param type The message type (i.e. operation type).
      */
-    private void setOp(String op) {
-        this.op = op;
+    private void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -263,7 +263,7 @@ public final class Message {
      * @return True if this message is a response, otherwise false.
      */
     public final boolean isResponse() {
-        return this.id != null && BuiltInMessageTypes.isResponse(this.op);
+        return this.id != null && BuiltInMessageTypes.isResponse(this.type);
     }
 
     /**
@@ -272,7 +272,7 @@ public final class Message {
      * @return True if the message represents an error, otherwise false.
      */
     public final boolean isError() {
-        return BuiltInMessageTypes.isError(this.op);
+        return BuiltInMessageTypes.isError(this.type);
     }
 
     /**

@@ -10,6 +10,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.function.Supplier;
 
+/**
+ * Constructs instances of {@link WebSocketClient} implementations.
+ */
 public final class WebSocketClientFactory {
     /**
      * Creates a new connection given a client implementation and the server URI.  The default constructor will be used

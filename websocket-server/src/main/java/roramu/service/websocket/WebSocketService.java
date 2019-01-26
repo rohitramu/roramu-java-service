@@ -31,7 +31,10 @@ public abstract class WebSocketService extends WebSocketEndpoint {
         Thread result = new Thread(runnable);
         result.setDaemon(true);
         result.setName("WebSocket keep-alive task");
-        result.setUncaughtExceptionHandler((thread, thr) -> System.err.println("WebSocket keep-alive task threw exception: " + thr.toString()));
+        result.setUncaughtExceptionHandler((thread, thr) -> {
+            //TODO: log
+            System.err.println("WebSocket keep-alive task threw exception: " + thr.toString());
+        });
 
         return result;
     });

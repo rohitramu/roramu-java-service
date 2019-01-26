@@ -134,10 +134,10 @@ public abstract class WebSocketEndpoint extends Endpoint {
         try {
             message = JsonUtils.read(stringMessage, new TypeInfo<Message>() {});
 
-            if (message.getOp() == null) {
+            if (message.getType() == null) {
                 throw new NullPointerException("Message type is null");
             }
-            String messageType = message.getOp().toUpperCase();
+            String messageType = message.getType();
             message.setReceivedMillis(TimeUtils.getCurrentMillis());
 
             if (message.isResponse()) {
@@ -145,7 +145,7 @@ public abstract class WebSocketEndpoint extends Endpoint {
             } else {
                 // Make sure a handler exists for this message type
                 if (!this.getMessageHandlers().containsKey(messageType)) {
-                    throw new IllegalArgumentException("Unknown message type '" + message.getOp() + "'");
+                    throw new IllegalArgumentException("Unknown message type '" + messageType + "'");
                 }
 
                 // Process the message

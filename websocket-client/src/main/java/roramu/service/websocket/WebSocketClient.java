@@ -25,8 +25,10 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A WebSocket client.
  * <p>
- * Service implementations should extend this class to provide implementation-specific methods for interacting with the
- * service's APIs.
+ * Service implementations should extend this class to provide
+ * implementation-specific methods for interacting with the service's APIs.
+ * WebSocketClient objects should only be constructed using
+ * {@link WebSocketClientFactory}.
  */
 public abstract class WebSocketClient extends WebSocketEndpoint implements AutoCloseable {
     // TODO: Connect to dependencies when locations are updated
@@ -161,7 +163,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     private static CallInfo stopTrackingRequest(Session session, String requestId) {
         Map<String, CallInfo> callInfoMap = WebSocketClient.waitingRequests.get(session);
         if (callInfoMap == null) {
-            throw new NullPointerException("Cannot stop tracking request - this session is not registered");
+            throw new IllegalArgumentException("Cannot stop tracking request - this session is not registered");
         }
 
         return callInfoMap.remove(requestId);
@@ -176,18 +178,27 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * </p>
      *
      * @param session The session.
+     * @return The session that was replaced, or null if there was no session
+     * being managed.
      */
-    public final void setSession(Session session) {
+    public final Session setSession(Session session) {
         if (session == null) {
             throw new NullPointerException("Session cannot be null");
         }
         if (!session.isOpen()) {
             throw new IllegalArgumentException("Session must be open to use it with a client");
         }
+        if (this.session == session) {
+            // If the session is already being managed, return the current session
+            return this.session;
+        }
 
         // Replace the old session with the new session
+        Session oldSession = this.session;
         this.session = session;
         WebSocketClient.waitingRequests.putIfAbsent(session, new ConcurrentHashMap<>());
+
+        return oldSession;
     }
 
     /**
@@ -281,7 +292,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
 
             String message =
                 "[" + requestId + "] "
-                    + StringUtils.padRight(30, callInfo.request.getOp())
+                    + StringUtils.padRight(30, callInfo.request.getType())
                     + StringUtils.padRight(30, "Roundtrip time = " + roundtripTime + " ms")
                     + StringUtils.padRight(30, "Processing time = " + processingTime + " ms")
                     + "Network latency = " + (roundtripTime - processingTime) + " ms";
