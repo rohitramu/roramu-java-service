@@ -5,6 +5,7 @@ import roramu.util.json.RawJsonString;
 import roramu.util.json.SimpleJsonConverter;
 import roramu.util.reflection.TypeInfo;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -24,6 +25,35 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
     private Function<Req, Res> handleTypedMessage;
 
     private TypedMessageHandler() {}
+
+    /**
+     * Constructs a new TypedMessageHandler object for methods that don't
+     * provide a response.
+     *
+     * @param <Req> The request type.
+     * @param messageType The message type which defines the request/response
+     * types as well as the converters to serialize/deserialize these types.
+     * @param handleTypedMessage The function to handle the deserialized
+     * message.
+     * @return The message handler.
+     */
+    public static <Req> TypedMessageHandler<Req, Void> create(MessageType<Req, Void> messageType, Consumer<Req> handleTypedMessage) {
+        if (messageType == null) {
+            throw new NullPointerException("'messageType' cannot be null");
+        }
+        if (handleTypedMessage == null) {
+            throw new NullPointerException("'handleTypedMessage' cannot be null");
+        }
+
+        // Convert the supplier into a function with an unused Void parameter
+        return create(
+            messageType,
+            (Req req) -> {
+                handleTypedMessage.accept(req);
+                return null;
+            }
+        );
+    }
 
     /**
      * Constructs a new TypedMessageHandler object for methods that don't
@@ -74,6 +104,36 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
             messageType.getRequestType(), messageType.getRequestJsonConverter(),
             messageType.getResponseType(), messageType.getResponseJsonConverter(),
             handleTypedMessage
+        );
+    }
+
+    /**
+     * Constructs a new TypedMessageHandler object for methods that don't require
+     * a response body. Both the request and response types will use the
+     * {@link SimpleJsonConverter} to serialize and deserialize requests/responses.
+     *
+     * @param <Req> The request type.
+     * @param requestType The type of object returned in the response body.
+     * @param handleTypedMessage The function to handle the deserialized
+     * message.
+     * @return The message handler.
+     */
+    public static <Req> TypedMessageHandler<Req, Void> create(TypeInfo<Req> requestType, Consumer<Req> handleTypedMessage) {
+        if (requestType == null) {
+            throw new NullPointerException("'requestType' cannot be null");
+        }
+        if (handleTypedMessage == null) {
+            throw new NullPointerException("'handleTypedMessage' cannot be null");
+        }
+
+        // Convert the supplier into a function with an unused Void parameter
+        return create(
+            requestType,
+            TypeInfo.VOID,
+            (Req req) -> {
+                handleTypedMessage.accept(req);
+                return null;
+            }
         );
     }
 
@@ -135,6 +195,44 @@ public final class TypedMessageHandler<Req, Res> implements MessageHandler {
             requestType, requestJsonConverter,
             responseType, responseJsonConverter,
             handleTypedMessage
+        );
+    }
+
+    /**
+     * Constructs a new TypedMessageHandler object.
+     *
+     * @param <Req> The request type.
+     * @param requestType The type of object provided in the request body.
+     * @param requestJsonConverter The converter used to convert the response
+     * object into the response body.
+     * @param handleTypedMessage The function to handle the deserialized
+     * message.
+     * @return The message handler.
+     */
+    public static <Req> TypedMessageHandler<Req, Void> create(
+        TypeInfo<Req> requestType,
+        JsonConverter<Req> requestJsonConverter,
+        Consumer<Req> handleTypedMessage
+    ) {
+        if (requestType == null) {
+            throw new NullPointerException("'responseType' cannot be null");
+        }
+        if (requestJsonConverter == null) {
+            throw new NullPointerException("'requestJsonConverter' cannot be null");
+        }
+        if (handleTypedMessage == null) {
+            throw new NullPointerException("'handleTypedMessage' cannot be null");
+        }
+
+        return create(
+            requestType,
+            requestJsonConverter,
+            TypeInfo.VOID,
+            JSON_CONVERTER_VOID,
+            (Req req) -> {
+                handleTypedMessage.accept(req);
+                return null;
+            }
         );
     }
 

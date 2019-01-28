@@ -39,44 +39,33 @@ public abstract class WebSocketService extends WebSocketEndpoint {
         return result;
     });
     private static ScheduledFuture<?> keepAliveTaskFuture = null;
+
     // Sessions
     private static final Map<Class<? extends WebSocketService>, Set<Session>> sessions = new ConcurrentHashMap<>();
 
+    // Service dependency proxies
+    private static final long DEFAULT_TIMEOUT = 5;
+    private static final TimeUnit DEFAULT_TIMEOUT_UNITS = TimeUnit.SECONDS;
+    private static final int DEFAULT_MAX_RETRIES = 10;
+
+    // Static constructor
     static {
         WebSocketService.startKeepAliveTask();
     }
 
     /**
-     * Handler for returning status.
+     * Gets the configuration for a given service implementation.
+     *
+     * @param serviceImplementation The service implementation.
+     * @return The configuration for the service implementation if one exists, otherwise null.
      */
-    @SuppressWarnings("FieldCanBeLocal")
-    private final MessageHandler statusHandler = TypedMessageHandler.create(
-        BuiltInMessageTypes.System.STATUS,
-        request -> {
-            // Safely process status - we don't want an error in service code to fail the status response
-            Object processedStatus;
-            try {
-                processedStatus = addExtraStatusInfo(request);
-            } catch (RuntimeException ex) {
-                processedStatus = new SafeErrorDetails("Failed to process status", ex, ex.getStackTrace(), true);
-            }
-            ServiceStatus status = new ServiceStatus(processedStatus);
-
-            return status;
+    public static final WebSocketServiceConfiguration getServiceConfiguration(Class<? extends WebSocketService> serviceImplementation) {
+        if (serviceImplementation == null) {
+            throw new IllegalArgumentException("'serviceImplementation' cannot be null");
         }
-    );
 
-    /**
-     * Handler for closing all sessions.
-     */
-    private final MessageHandler closeSessionsHandler = TypedMessageHandler.create(
-        BuiltInMessageTypes.System.CLOSE_ALL_SESSIONS,
-        request -> {
-            CloseReason closeReason = new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "Service is being undeployed");
-            closeAllSessions(closeReason);
-            return null;
-        }
-    );
+        return (WebSocketServiceConfiguration) WebSocketEndpoint.getEndpointConfiguration(serviceImplementation);
+    }
 
     /**
      * Gets the default {@link ServerEndpointConfig} object used for deploying a
@@ -84,9 +73,9 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      *
      * @param impl The implementing service.
      * @param path The path of the service (must start with a '{@code /}' character).
-     * @return The configuration.
+     * @return The server endpoint configuration.
      */
-    public static final ServerEndpointConfig getDefaultConfig(Class<? extends WebSocketService> impl, String path) {
+    public static final ServerEndpointConfig getDefaultJavaxConfig(Class<? extends WebSocketService> impl, String path) {
         return getConfigBuilder(impl, path).build();
     }
 
@@ -99,9 +88,9 @@ public abstract class WebSocketService extends WebSocketEndpoint {
      * @param configurator The configurator implementation to be used in the
      * configuration. A configurator is most commonly used to intercept the
      * WebSocket handshake.
-     * @return The configuration.
+     * @return The server endpoint configuration.
      */
-    public static final ServerEndpointConfig getDefaultConfig(Class<? extends WebSocketService> impl, String path, ServerEndpointConfig.Configurator configurator) {
+    public static final ServerEndpointConfig getDefaultJavaxConfig(Class<? extends WebSocketService> impl, String path, ServerEndpointConfig.Configurator configurator) {
         if (configurator == null) {
             throw new NullPointerException("'configurator' cannot be null");
         }
@@ -130,23 +119,75 @@ public abstract class WebSocketService extends WebSocketEndpoint {
     }
 
     /**
-     * Creates the message handlers for the service.  Subclasses should call
-     * {@code super.createMessageHandlers()} to obtain the map instead of
-     * constructing their own.
+     * Gets the configuration registered for this service instance.
      *
-     * @return The message handlers for the service.
+     * @return The service configuration.
      */
     @Override
-    protected Map<String, MessageHandler> createMessageHandlers() {
-        Map<String, MessageHandler> handlers = super.createMessageHandlers();
+    protected final WebSocketServiceConfiguration getConfiguration() {
+        return (WebSocketServiceConfiguration)super.getConfiguration();
+    }
+
+    /**
+     * Creates a service configuration. This should be overridden by
+     * subclasses to provide implementation details. Subclasses should
+     * call {@code super.createConfiguration()}
+     * to obtain the configuration object instead of creating their own.
+     *
+     * @return The service configuration.
+     */
+    @Override
+    protected WebSocketServiceConfiguration createConfiguration() {
+        WebSocketServiceConfiguration config = new WebSocketServiceConfiguration(super.createConfiguration());
+
+        // Get the message handlers
+        MessageHandlerManager handlers = config.getMessageHandlers();
 
         // Add the default "STATUS" message handler
-        handlers.put(BuiltInMessageTypes.System.STATUS.getName(), statusHandler);
+        handlers.set(BuiltInMessageTypes.System.STATUS, request -> {
+            // Safely process status - we don't want an error in service code to fail the status response
+            Object processedStatus;
+            try {
+                processedStatus = addExtraStatusInfo(request);
+            } catch (RuntimeException ex) {
+                processedStatus = new SafeErrorDetails("Failed to process status", ex, ex.getStackTrace(), true);
+            }
+            ServiceStatus status = new ServiceStatus(processedStatus);
+
+            return status;
+        });
 
         // Add the default "CLOSE_ALL_SESSIONS" message handler
-        handlers.put(BuiltInMessageTypes.System.CLOSE_ALL_SESSIONS.getName(), closeSessionsHandler);
+        handlers.set(BuiltInMessageTypes.System.CLOSE_ALL_SESSIONS, request -> {
+            CloseReason closeReason = new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "Service is being undeployed");
+            closeAllSessions(closeReason);
+            return null;
+        });
 
-        return handlers;
+        return config;
+    }
+
+    public static <S extends WebSocketService, C extends WebSocketClient> C getServiceProxyClient(Class<S> callerServiceImplementation, Class<C> targetClientImplementation, String targetServiceName) {
+        return WebSocketService.getServiceProxyClient(
+            callerServiceImplementation,
+            targetClientImplementation,
+            targetServiceName,
+            DEFAULT_MAX_RETRIES,
+            DEFAULT_TIMEOUT, DEFAULT_TIMEOUT_UNITS);
+    }
+
+    public static <S extends WebSocketService, C extends WebSocketClient> C getServiceProxyClient(Class<S> callerServiceImplementation, Class<C> clientImplementation, String targetServiceName, int maxRetries, long timeout, TimeUnit timeoutUnits) {
+        try {
+            return WebSocketService
+                .getServiceConfiguration(callerServiceImplementation)
+                .getServiceProxies()
+                .get(targetServiceName, clientImplementation)
+                .getClientAsync(maxRetries)
+                .get(timeout, timeoutUnits);
+        } catch (Exception ex) {
+            String clientTypeName = clientImplementation.getPackageName() + "." + clientImplementation.getSimpleName();
+            throw new RuntimeException("Failed to get client of type '" + clientTypeName + "' for service '" + targetServiceName + "'", ex);
+        }
     }
 
     /**
@@ -292,6 +333,7 @@ public abstract class WebSocketService extends WebSocketEndpoint {
     /**
      * Stops the task which automatically updates this resource's status.
      */
+    @SuppressWarnings("unused")
     private static void stopKeepAliveTask() {
         if (keepAliveTaskFuture != null) {
             keepAliveTaskFuture.cancel(true);

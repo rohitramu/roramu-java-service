@@ -8,10 +8,15 @@ import roramu.util.string.StringUtils;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.CloseReason;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -21,14 +26,16 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 /**
  * A WebSocket client.
  * <p>
  * Service implementations should extend this class to provide
- * implementation-specific methods for interacting with the service's APIs.
- * WebSocketClient objects should only be constructed using
- * {@link WebSocketClientFactory}.
+ * implementation-specific methods for interacting with their service's
+ * APIs. WebSocketClient objects should only be constructed using the
+ * static factory methods found on {@link WebSocketClient}
+ * (e.g. {@link WebSocketClient#connect(Class)}.
  */
 public abstract class WebSocketClient extends WebSocketEndpoint implements AutoCloseable {
     // TODO: Connect to dependencies when locations are updated
@@ -44,16 +51,13 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
     private Session session;
 
     /**
-     * Handler for errors.
+     * The default address for the service that this client implementation
+     * connects to.  This method should be implemented as a constant value
+     * (i.e. the return value should never change and should not be null).
+     *
+     * @return The default service address.
      */
-    @SuppressWarnings("FieldCanBeLocal")
-    private final MessageHandler errorHandler = TypedMessageHandler.create(
-        BuiltInMessageTypes.Response.ERROR,
-        (request) -> {
-            System.err.println("ERROR:\n" + JsonUtils.write(request));
-            return null;
-        }
-    );
+    public abstract URI getDefaultServiceAddress();
 
     /**
      * Gets the default {@link ClientEndpointConfig} object used for creating a
@@ -61,7 +65,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      *
      * @return The configuration.
      */
-    public static final ClientEndpointConfig getDefaultConfig() {
+    public static final ClientEndpointConfig getDefaultJavaxConfig() {
         return getConfigBuilder().build();
     }
 
@@ -74,7 +78,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
      * WebSocket handshake.
      * @return The configuration.
      */
-    public static final ClientEndpointConfig getDefaultConfig(ClientEndpointConfig.Configurator configurator) {
+    public static final ClientEndpointConfig getDefaultJavaxConfig(ClientEndpointConfig.Configurator configurator) {
         if (configurator == null) {
             throw new NullPointerException("'configurator' cannot be null");
         }
@@ -82,6 +86,20 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
         return getConfigBuilder()
             .configurator(configurator)
             .build();
+    }
+
+    /**
+     * Gets the configuration for a given client implementation.
+     *
+     * @param clientImplementation The client implementation.
+     * @return The configuration for the client implementation if one exists, otherwise null.
+     */
+    public static final WebSocketClientConfiguration getClientConfiguration(Class<? extends WebSocketClient> clientImplementation) {
+        if (clientImplementation == null) {
+            throw new IllegalArgumentException("'clientImplementation' cannot be null");
+        }
+
+        return (WebSocketClientConfiguration) WebSocketEndpoint.getEndpointConfiguration(clientImplementation);
     }
 
     /**
@@ -244,14 +262,41 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
         WebSocketClient.waitingRequests.remove(this.session);
     }
 
+    /**
+     * Gets the configuration registered for this client instance.
+     *
+     * @return The client configuration.
+     */
     @Override
-    protected final Map<String, MessageHandler> createMessageHandlers() {
-        Map<String, MessageHandler> handlers = super.createMessageHandlers();
+    protected final WebSocketClientConfiguration getConfiguration() {
+        return (WebSocketClientConfiguration)super.getConfiguration();
+    }
 
-        // Add the "ERROR" message handler
-        handlers.putIfAbsent(BuiltInMessageTypes.Response.ERROR.getName(), errorHandler);
+    /**
+     * Creates a client configuration. This should be overridden by
+     * subclasses to provide implementation details. Subclasses should
+     * call {@code super.createConfiguration()}
+     * to obtain the configuration object instead of creating their own.
+     *
+     * @return The client configuration.
+     */
+    @Override
+    protected WebSocketClientConfiguration createConfiguration() {
+        WebSocketClientConfiguration config = new WebSocketClientConfiguration(super.createConfiguration());
 
-        return handlers;
+        // Get the message handlers
+        MessageHandlerManager handlers = config.getMessageHandlers();
+
+        // Add the "ERROR" message handler if it doesn't already exist
+        String messageTypeName = BuiltInMessageTypes.Response.ERROR.getName();
+        if (!handlers.getMessageTypes().contains(messageTypeName)) {
+            handlers.set(BuiltInMessageTypes.Response.ERROR, (request) -> {
+                System.err.println("ERROR:\n" + JsonUtils.write(request));
+                return null;
+            });
+        }
+
+        return config;
     }
 
     @Override
@@ -287,15 +332,15 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
         if (callInfo != null) {
             // We were waiting for this response, so handle it
             callInfo.setResult(response);
-            long roundtripTime = response.getReceivedMillis() - response.getSentMillis();
+            long roundTripTime = response.getReceivedMillis() - response.getSentMillis();
             long processingTime = response.getStopProcessingMillis() - response.getStartProcessingMillis();
 
             String message =
                 "[" + requestId + "] "
                     + StringUtils.padRight(30, callInfo.request.getType())
-                    + StringUtils.padRight(30, "Roundtrip time = " + roundtripTime + " ms")
+                    + StringUtils.padRight(30, "Round-trip time = " + roundTripTime + " ms")
                     + StringUtils.padRight(30, "Processing time = " + processingTime + " ms")
-                    + "Network latency = " + (roundtripTime - processingTime) + " ms";
+                    + "Network latency = " + (roundTripTime - processingTime) + " ms";
 
             // TODO: log
             System.out.println(message);
@@ -774,6 +819,7 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
             return this.request;
         }
 
+        @SuppressWarnings("unused")
         private boolean hasResult() {
             return this.receivedResult;
         }
@@ -833,5 +879,194 @@ public abstract class WebSocketClient extends WebSocketEndpoint implements AutoC
                 lock.unlock();
             }
         }
+    }
+
+    /**
+     * Creates a new connection given a client implementation.  The default constructor will be used
+     * to construct an instance of this client implementation.  Do not use this overload if the client implementation
+     * does not have a default constructor.
+     *
+     * The resulting client will be connected to the default server address, provided by
+     * {@link WebSocketClient#getDefaultServiceAddress()}.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation) {
+        return connect(implementation, (URI)null, null);
+    }
+
+    /**
+     * Creates a new connection given a client implementation and the server URI.  The default constructor will be used
+     * to construct an instance of this client implementation.  Do not use this overload if the client implementation
+     * does not have a default constructor.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param address The path to the WebSocket server to connect to.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, URI address) {
+        return connect(implementation, address, null);
+    }
+
+    /**
+     * Creates a new connection given a client implementation.  The supplied implementation factory
+     * will be used to create an instance of this client implementation.  If the implementation factory is null, the
+     * default constructor will be used to construct the instance of the client implementation.
+     *
+     * The resulting client will be connected to the default server address, provided by
+     * {@link WebSocketClient#getDefaultServiceAddress()}.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param implementationFactory The method which constructs the client implementation.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, Supplier<T> implementationFactory) {
+        return connect(implementation, (URI)null, implementationFactory, WebSocketClient.getDefaultJavaxConfig());
+    }
+
+    /**
+     * Creates a new connection given a client implementation and the server URI.  The supplied implementation factory
+     * will be used to create an instance of this client implementation.  If the implementation factory is null, the
+     * default constructor will be used to construct the instance of the client implementation.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param address The path to the WebSocket server to connect to.
+     * @param implementationFactory The method which constructs the client implementation.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, URI address, Supplier<T> implementationFactory) {
+        return connect(implementation, address, implementationFactory, WebSocketClient.getDefaultJavaxConfig());
+    }
+
+    /**
+     * Creates a new connection given a client implementation.  The supplied implementation factory
+     * will be used to create an instance of this client implementation.  If the implementation factory is null, the
+     * default constructor will be used to construct the instance of the client implementation.
+     *
+     * The resulting client will be connected to the default server address, provided by
+     * {@link WebSocketClient#getDefaultServiceAddress()}.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param implementationFactory The method which constructs the client implementation.
+     * @param configurator The {@link ClientEndpointConfig.Configurator} to use.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, Supplier<T> implementationFactory, ClientEndpointConfig.Configurator configurator) {
+        if (configurator == null) {
+            throw new NullPointerException("'configurator' cannot be null");
+        }
+
+        return connect(implementation, (URI)null, implementationFactory, WebSocketClient.getDefaultJavaxConfig(configurator));
+    }
+
+    /**
+     * Creates a new connection given a client implementation and the server URI.  The supplied implementation factory
+     * will be used to create an instance of this client implementation.  If the implementation factory is null, the
+     * default constructor will be used to construct the instance of the client implementation.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param address The path to the WebSocket server to connect to.
+     * @param implementationFactory The method which constructs the client implementation.
+     * @param configurator The {@link ClientEndpointConfig.Configurator} to use.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, URI address, Supplier<T> implementationFactory, ClientEndpointConfig.Configurator configurator) {
+        if (configurator == null) {
+            throw new NullPointerException("'configurator' cannot be null");
+        }
+
+        return connect(implementation, address, implementationFactory, WebSocketClient.getDefaultJavaxConfig(configurator));
+    }
+
+    /**
+     * Creates a new connection given a client implementation.  The supplied implementation factory
+     * will be used to create an instance of this client implementation.  If the implementation factory is null, the
+     * default constructor will be used to construct the instance of the client implementation.
+     *
+     * The resulting client will be connected to the default server address, provided by
+     * {@link WebSocketClient#getDefaultServiceAddress()}.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param implementationFactory The method which constructs the client implementation.
+     * @param config The {@link ClientEndpointConfig} to use.  This provides even more configurability than a {@link ClientEndpointConfig.Configurator}.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, Supplier<T> implementationFactory, ClientEndpointConfig config) {
+        return connect(implementation, (URI)null, implementationFactory, config);
+    }
+
+    /**
+     * Creates a new connection given a client implementation and the server URI.  The supplied implementation factory
+     * will be used to create an instance of this client implementation.  If the implementation factory is null, the
+     * default constructor will be used to construct the instance of the client implementation.
+     *
+     * @param <T> The concrete type of the {@link WebSocketClient} implementation.
+     * @param implementation The {@link WebSocketClient} implementation.
+     * @param address The path to the WebSocket server to connect to.
+     * @param implementationFactory The method which constructs the client implementation.
+     * @param config The {@link ClientEndpointConfig} to use.  This provides even more configurability than a {@link ClientEndpointConfig.Configurator}.
+     * @return An instance of the client implementation which is attached to a WebSocket session for the given server path.
+     */
+    public static <T extends WebSocketClient> T connect(Class<T> implementation, URI address, Supplier<T> implementationFactory, ClientEndpointConfig config) {
+        if (implementation == null) {
+            throw new IllegalArgumentException("'implementation' cannot be null");
+        }
+        if (config == null) {
+            throw new IllegalArgumentException("'config' cannot be null");
+        }
+
+        // Construct an instance of the client
+        T webSocketClient;
+        if (implementationFactory != null) {
+            // Implementation factory was provided, so use it to construct an instance
+            webSocketClient = implementationFactory.get();
+        } else {
+            // Try to call the default constructor since an implementation factory was not provided
+            try {
+                webSocketClient = implementation.getConstructor().newInstance();
+            } catch (NoSuchMethodException ex) {
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' does not have a default constructor - please provide the implementationFactory argument", ex);
+            } catch (InstantiationException ex) {
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' is abstract, and cannot be instantiated with the default constructor", ex);
+            } catch (IllegalAccessException ex) {
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' has a default constructor which cannot by accessed", ex);
+            } catch (InvocationTargetException ex) {
+                throw new IllegalArgumentException("The class '" + implementation.getCanonicalName() + "' threw an exception when the default constructor was invoked", ex);
+            }
+        }
+
+        // If the URI was not specified, get the default service address
+        if (address == null) {
+            address = webSocketClient.getDefaultServiceAddress();
+            if (address == null) {
+                throw new NullPointerException("The class '" + implementation.getPackageName() + "." + implementation.getSimpleName() + "' returned null when getting the default service address");
+            }
+        }
+
+        // Create a WebSocket session
+        Session session;
+        try {
+            // Initialize javax.websocket layer
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
+            // Add WebSocket endpoint to javax.websocket layer
+            session = container.connectToServer(implementation, config, address);
+        } catch (DeploymentException | IOException ex) {
+            // TODO: log
+            throw new RuntimeException("Could not connect to server", ex);
+        }
+
+        // Manage the session using the created instance of the client
+        webSocketClient.setSession(session);
+
+        return webSocketClient;
     }
 }

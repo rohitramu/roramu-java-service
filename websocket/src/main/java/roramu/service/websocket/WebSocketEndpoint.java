@@ -22,9 +22,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -42,6 +41,37 @@ public abstract class WebSocketEndpoint extends Endpoint {
     private static final long MAX_TEXT_MESSAGE_LENGTH = 65536; // 64kB is the max WebSocket text message size
 
     /**
+     * Endpoint configuration per subclass.
+     */
+    private static final Map<Class<? extends WebSocketEndpoint>, WebSocketEndpointConfiguration> endpointConfigurations = new ConcurrentHashMap<>();
+
+    /**
+     * Constructs a new WebSocket endpoint and populates the endpoint configuration.
+     */
+    public WebSocketEndpoint() {
+        Class<? extends WebSocketEndpoint> endpointImplementation = this.getClass();
+
+        // Set the endpoint configuration for each subtype
+        if (WebSocketEndpoint.endpointConfigurations.get(endpointImplementation) == null) {
+            WebSocketEndpoint.endpointConfigurations.put(endpointImplementation, this.createConfiguration());
+        }
+    }
+
+    /**
+     * Gets the configuration for a given endpoint implementation.
+     *
+     * @param endpointImplementation The endpoint implementation.
+     * @return The configuration for the endpoint implementation if one exists, otherwise null.
+     */
+    public static final WebSocketEndpointConfiguration getEndpointConfiguration(Class<? extends WebSocketEndpoint> endpointImplementation) {
+        if (endpointImplementation == null) {
+            throw new IllegalArgumentException("'endpointImplementation' cannot be null");
+        }
+
+        return WebSocketEndpoint.endpointConfigurations.get(endpointImplementation);
+    }
+
+    /**
      * Sends a ping.
      *
      * @param session The session to use when sending the ping.
@@ -56,37 +86,27 @@ public abstract class WebSocketEndpoint extends Endpoint {
     }
 
     /**
-     * Gets the message handlers.
+     * Gets the configuration for this WebSocket endpoint object.
      *
-     * @return The message handlers.
+     * @return The WebSocket endpoint's configuration.
      */
-    public final Map<String, MessageHandler> getMessageHandlers() {
-        Map<String, MessageHandler> messageHandlers = this.createMessageHandlers();
-        if (messageHandlers == null) {
-            throw new NullPointerException("The 'createMessageHandlers()' method returned null. Did you mean for it to return an empty map instead?");
-        }
-
-        return Collections.unmodifiableMap(messageHandlers);
+    protected WebSocketEndpointConfiguration getConfiguration() {
+        return endpointConfigurations.get(this.getClass());
     }
 
     /**
-     * Provides the message handlers for different message types. Returns an
-     * empty map if specialized message handlers are not required (e.g. in the
-     * case of simple clients).
+     * Creates the configuration for this WebSocket endpoint object.
      * <p>
      * NOTE: Implementations should first call
-     * {@code super.createMessageHandlers()} to get the default message
-     * handlers (e.g. the "STATUS" and "ERROR" message handlers).
+     * {@code super.createConfiguration()} to get the default configuration
+     * (e.g. the "STATUS" and "ERROR" message handlers).
      * </p>
      * <p>
-     * It is recommended that the {@link MessageHandler} objects returned from
-     * this method are first declared as static variables outside the method to
-     * prevent them being recreated for every connection.
      *
      * @return The message handlers. This method should never return null.
      */
-    protected Map<String, MessageHandler> createMessageHandlers() {
-        return new HashMap<>();
+    protected WebSocketEndpointConfiguration createConfiguration() {
+        return new WebSocketEndpointConfiguration();
     }
 
     /**
@@ -144,13 +164,13 @@ public abstract class WebSocketEndpoint extends Endpoint {
                 handleResponse(session, message);
             } else {
                 // Make sure a handler exists for this message type
-                if (!this.getMessageHandlers().containsKey(messageType)) {
+                MessageHandler messageHandler = this.getConfiguration().getMessageHandlers().get(messageType);
+                if (messageHandler == null) {
                     throw new IllegalArgumentException("Unknown message type '" + messageType + "'");
                 }
 
                 // Process the message
-                MessageHandler handler = this.getMessageHandlers().get(messageType);
-                RawJsonString response = handler.handleMessage(message.getBody());
+                RawJsonString response = messageHandler.handleMessage(message.getBody());
 
                 // If the client is expecting a response, send one back
                 if (message.isExpectingResponse()) {
@@ -274,7 +294,8 @@ public abstract class WebSocketEndpoint extends Endpoint {
                 @Override
                 public void onMessage(PongMessage message) {
                     long pingSendTime = Long.parseLong(new String(message.getApplicationData().array()));
-                    long roundtripMillis = TimeUtils.getCurrentMillis() - pingSendTime;
+                    @SuppressWarnings("unused")
+                    long roundTripMillis = TimeUtils.getCurrentMillis() - pingSendTime;
                     // TODO: log
                 }
             });

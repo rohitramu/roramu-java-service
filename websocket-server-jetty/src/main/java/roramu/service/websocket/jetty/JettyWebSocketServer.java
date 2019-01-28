@@ -34,15 +34,15 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
     private static final String WEBSOCKET_ROUTE = "/";
 
     public Server start(String healthRoute, int port, Class<T> implementation) {
-        return this.start(healthRoute, port, WebSocketService.getDefaultConfig(implementation, WEBSOCKET_ROUTE));
+        return this.start(healthRoute, port, WebSocketService.getDefaultJavaxConfig(implementation, WEBSOCKET_ROUTE));
     }
 
     public Server start(String healthRoute, int port, Class<T> implementation, WebSocketHandshakeFilter handshakeFilter) {
-        return this.start(healthRoute, port, WebSocketService.getDefaultConfig(implementation, WEBSOCKET_ROUTE), handshakeFilter);
+        return this.start(healthRoute, port, WebSocketService.getDefaultJavaxConfig(implementation, WEBSOCKET_ROUTE), handshakeFilter);
     }
 
     public Server start(String healthRoute, int port, Class<T> implementation, ServerEndpointConfig.Configurator configurator) {
-        return this.start(healthRoute, port, WebSocketService.getDefaultConfig(implementation, WEBSOCKET_ROUTE, configurator), null);
+        return this.start(healthRoute, port, WebSocketService.getDefaultJavaxConfig(implementation, WEBSOCKET_ROUTE, configurator), null);
     }
 
     public Server start(String healthRoute, int port, ServerEndpointConfig config) {
@@ -50,7 +50,7 @@ public final class JettyWebSocketServer<T extends WebSocketService> {
     }
 
     public Server start(String healthRoute, int port, Class<T> implementation, ServerEndpointConfig.Configurator configurator, WebSocketHandshakeFilter handshakeFilter) {
-        return this.start(healthRoute, port, WebSocketService.getDefaultConfig(implementation, WEBSOCKET_ROUTE, configurator), handshakeFilter);
+        return this.start(healthRoute, port, WebSocketService.getDefaultJavaxConfig(implementation, WEBSOCKET_ROUTE, configurator), handshakeFilter);
     }
 
     /**
